@@ -9,7 +9,7 @@ WebView. No frontend code is duplicated or changed.
 ```
 Android Activity
   -> EmbeddedServer (libopencode.so serve --hostname=127.0.0.1)
-  -> WebView loads http://127.0.0.1:4096/ (packages/app bundle served by the server)
+  -> WebView loads http://127.0.0.1:<port>/ (port selected at startup) (packages/app bundle served by the server)
 ```
 
 ## Layout
@@ -36,7 +36,7 @@ Generated binaries are not committed (see `.gitignore`). Build everything with:
 ./script/android/build-apk.sh
 ```
 
-The APK is written to `app/build/outputs/apk/debug/app-debug.apk` and can be
+From the repository root, the build script writes `packages/android/app/build/outputs/apk/debug/app-debug.apk`. It can be
 installed with `adb install -r`.
 
 ## Runtime decisions
@@ -53,8 +53,7 @@ installed with `adb install -r`.
   `OPENCODE_DISABLE_FFF=true`.
 - **bun/node** are the bare Bun Android runtime, so the agent can execute
   JS/TS files inside the workspace.
-- **HOME/XDG** live under `files/home`; the default workspace is
-  `files/home/workspace`.
+- **HOME/XDG** live under `/sdcard/OpenCode/home` when all-files access is granted; otherwise they use app-private `files/home`. The default workspace is `HOME/workspace`. Data in app-private storage is removed on uninstall. WebView project selection may need to be restored after reinstall.
 - **Session history** is grouped by directory. The host canonicalizes HOME and
   workspace paths (`/data/data/...`) and migrates older UI state that stored
   the `/data/user/0/...` alias, so the home list matches the server records.
@@ -74,6 +73,5 @@ installed with `adb install -r`.
 ## Security posture
 
 - Server binds `127.0.0.1` only; cleartext traffic is limited to loopback.
-- No Termux, no root, no external server; provider traffic originates from the
-  device.
+- No Termux app, root, or external OpenCode server is required; provider traffic originates from the device. Cloud providers still require a network connection and credentials.
 - `docs/android/EXECUTION_POLICY.md` documents the W^X constraints.
