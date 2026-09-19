@@ -1,7 +1,7 @@
 # opencode for Android
 
 Android host for the existing opencode application. The APK ships the
-unmodified opencode server (built with `bun build --compile
+OpenCode server with the [documented Android compatibility patches](../../docs/android/UPSTREAM_PATCHES.md) (built with `bun build --compile
 --target=bun-linux-arm64-android`) together with the production bundle of
 `packages/app`, starts it on loopback and hosts the existing web UI in a
 WebView. No frontend code is duplicated or changed.
@@ -9,7 +9,7 @@ WebView. No frontend code is duplicated or changed.
 ```
 Android Activity
   -> EmbeddedServer (libopencode.so serve --hostname=127.0.0.1)
-  -> WebView loads http://127.0.0.1:<port>/ (port selected at startup) (packages/app bundle served by the server)
+  -> WebView loads http://127.0.0.1:<port>/ (port selected at startup; packages/app bundle served by the server)
 ```
 
 ## Layout
