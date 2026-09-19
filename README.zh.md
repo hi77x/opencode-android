@@ -44,6 +44,9 @@
 
 ## opencode Android 版
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 本分支让现有的 opencode 在 Android 上原生运行：手机本地运行真正的服务器、Agent、会话以及**未经修改**的 `packages/app` Web 界面（通过 WebView 里的 loopback 访问）。无需电脑、Termux、远程服务器，也不改动协议。
 
 我们在上游之上新增的内容（其余都是上游 opencode）：
@@ -56,11 +59,11 @@
 
 只修改了五个上游文件（Android 构建目标和运行时兼容性）；每个改动及原因都记录在 [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md)。
 
-工作原理：Activity 启动内嵌服务器（`libopencode.so serve --hostname=127.0.0.1`），并在 WebView 中加载 `http://127.0.0.1:4096/`。工具从应用的 nativeLibraryDir 运行：`/system/bin/sh`、内置 `git`、`rg`，以及以 `bun`/`node` 暴露的 Bun 运行时。
+工作原理：Activity 启动内嵌服务器（`libopencode.so serve --hostname=127.0.0.1`），并在 WebView 中加载 `http://127.0.0.1:<port>/`。工具从应用的 nativeLibraryDir 运行：`/system/bin/sh`、内置 `git`、`rg`，以及以 `bun`/`node` 暴露的 Bun 运行时。
 
 - **下载**：[releases](https://github.com/hi77x/opencode-android/releases)（`app-release.apk`，arm64，Android 8.0+）
 - **构建**：`./script/android/build-apk.sh` — 参见 [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **首次启动**：授予文件访问权限（会话保存在 `/sdcard/OpenCode`，重装后仍保留），然后在 设置 → 提供商 中连接提供商并添加项目（`~/workspace`）
+- **首次启动**：授予文件访问权限（会话保存在 `/sdcard/OpenCode/home`，重装后仍保留），然后在 设置 → 提供商 中连接提供商并添加项目（`~/workspace`）
 - **可用**：服务器与 Web 界面、会话、带语法高亮差异的 git（Changes）、项目文件浏览器（Files）、上下文用量面板（Usage）、命令与 JS/TS 执行
 - **限制**：没有 PTY 终端、LSP/格式化工具和本地 MCP 进程；原生 file watcher 不可用（搜索使用 `rg`）
 - **许可证**：MIT，与原项目相同
@@ -103,7 +106,7 @@ OpenCode 也提供桌面版应用。可直接从 [发布页 (releases page)](htt
 
 ### 移动应用（BETA）
 
-OpenCode 也能在 Android 上以本分支构建的原生 APK 运行。应用内含真正的服务器和同一个 Web 界面；会话、提供商密钥和项目保存在 `/sdcard/OpenCode`，重装后仍然保留。
+OpenCode 也能在 Android 上以本分支构建的原生 APK 运行。应用内含真正的服务器和同一个 Web 界面；会话、提供商密钥和项目保存在 `/sdcard/OpenCode/home`，重装后仍然保留。
 
 | 平台 | 下载 | 说明 |
 | --- | --- | --- |
