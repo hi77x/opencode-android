@@ -44,6 +44,9 @@
 
 ## Android 版 opencode
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 このフォークは既存の opencode を Android 上でネイティブに動かします。スマートフォン上で本物のサーバー、エージェント、セッション、そして**変更していない** `packages/app` の Web UI（WebView 内の loopback 経由）が動作します。PC も Termux もリモートサーバーも不要で、プロトコルの変更もありません。
 
 私たちが upstream に追加したもの（それ以外はすべて upstream の opencode です）:
@@ -56,11 +59,11 @@
 
 変更する upstream ファイルは 5 つだけです（Android ビルドターゲットとランタイム互換性）。それぞれ理由を [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md) に記載しています。
 
-仕組み: Activity が内蔵サーバーを起動し（`libopencode.so serve --hostname=127.0.0.1`）、WebView で `http://127.0.0.1:4096/` を読み込みます。ツールはアプリの nativeLibraryDir から実行されます: `/system/bin/sh`、同梱の `git`、`rg`、そして `bun`/`node` として公開される Bun ランタイム。
+仕組み: Activity が内蔵サーバーを起動し（`libopencode.so serve --hostname=127.0.0.1`）、WebView で `http://127.0.0.1:<port>/` を読み込みます。ツールはアプリの nativeLibraryDir から実行されます: `/system/bin/sh`、同梱の `git`、`rg`、そして `bun`/`node` として公開される Bun ランタイム。
 
 - **ダウンロード**: [releases](https://github.com/hi77x/opencode-android/releases)（`app-release.apk`、arm64、Android 8.0+）
 - **ビルド**: `./script/android/build-apk.sh` — [`docs/android/BUILD.md`](docs/android/BUILD.md) を参照
-- **初回起動**: ファイルアクセスを許可（セッションは `/sdcard/OpenCode` に保存され、再インストール後も残ります）。次に 設定 → プロバイダー でプロバイダーを接続し、プロジェクト（`~/workspace`）を追加します
+- **初回起動**: ファイルアクセスを許可（セッションは `/sdcard/OpenCode/home` に保存され、再インストール後も残ります）。次に 設定 → プロバイダー でプロバイダーを接続し、プロジェクト（`~/workspace`）を追加します
 - **動作する**: サーバーと Web UI、セッション、差分とシンタックスハイライト付きの git（Changes）、プロジェクトファイルブラウザ（Files）、コンテキスト使用量パネル（Usage）、コマンドと JS/TS の実行
 - **制限**: PTY ターミナル、LSP／フォーマッター、ローカル MCP プロセスはなし。ネイティブ file watcher は利用不可（検索は `rg` を使用）
 - **ライセンス**: MIT（オリジナルと同じ）
@@ -103,7 +106,7 @@ OpenCode はデスクトップアプリとしても利用できます。[release
 
 ### モバイルアプリ (BETA)
 
-OpenCode はこのフォークからビルドしたネイティブ APK として Android でも動作します。本物のサーバーと同じ Web UI を同梱し、セッション、プロバイダーキー、プロジェクトは `/sdcard/OpenCode` に保存されて再インストール後も残ります。
+OpenCode はこのフォークからビルドしたネイティブ APK として Android でも動作します。本物のサーバーと同じ Web UI を同梱し、セッション、プロバイダーキー、プロジェクトは `/sdcard/OpenCode/home` に保存されて再インストール後も残ります。
 
 | プラットフォーム | ダウンロード | 備考 |
 | --- | --- | --- |
