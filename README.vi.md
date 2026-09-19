@@ -44,16 +44,26 @@
 
 ## opencode cho Android
 
-Bản fork này cung cấp bản dựng Android đầy đủ của opencode: máy chủ thật, agent, phiên làm việc và giao diện web gốc chạy cục bộ trên điện thoại. Giao diện là gói `packages/app` không thay đổi, được phục vụ qua loopback trong WebView. Không cần PC, Termux hay máy chủ từ xa.
+Bản fork này chạy opencode hiện có một cách native trên Android: điện thoại chạy máy chủ thật, agent, phiên làm việc và giao diện `packages/app` **không thay đổi** (qua loopback trong WebView). Không cần PC, Termux, máy chủ từ xa và không thay đổi giao thức.
 
-Trong APK: máy chủ opencode (bản dựng Bun 1.4.2 cho Android), git với diff và tô sáng cú pháp, trình duyệt tệp dự án, bảng mức sử dụng ngữ cảnh và chạy JS/TS qua runtime Bun đi kèm (`bun`/`node`), cùng ripgrep.
+Những gì chúng tôi thêm vào (phần còn lại là opencode upstream):
 
-- **Tải xuống**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **Cài đặt**: `adb install -r app-release.apk`
-- **Build**: `./script/android/build-apk.sh`
-- **Lần chạy đầu**: kết nối nhà cung cấp trong Cài đặt → Nhà cung cấp và thêm dự án (`~/workspace`).
-- **Hạn chế**: không có terminal PTY, LSP/trình định dạng hay tiến trình MCP cục bộ; tìm kiếm dùng `rg`.
-- **Giấy phép**: MIT, giống bản gốc.
+| Đường dẫn | Nội dung |
+| --- | --- |
+| [`packages/android`](packages/android) | Host Android: dự án Gradle, Activity WebView, máy chủ nhúng, tinh chỉnh UI di động |
+| [`script/android`](script/android) | Build tái lập: [`build-apk.sh`](script/android/build-apk.sh) cùng script cho máy chủ, ripgrep, runtime git và bản dịch |
+| [`docs/android`](docs/android) | Tài liệu kỹ thuật: [build](docs/android/BUILD.md), [chính sách thực thi](docs/android/EXECUTION_POLICY.md), [phụ thuộc native](docs/android/NATIVE_DEPENDENCIES.md), [bản vá upstream](docs/android/UPSTREAM_PATCHES.md) |
+
+Chỉ năm tệp upstream được sửa (mục tiêu build Android và tương thích runtime); mỗi thay đổi đều có lý do trong [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
+
+Cách hoạt động: Activity khởi động máy chủ nhúng (`libopencode.so serve --hostname=127.0.0.1`) và tải `http://127.0.0.1:4096/` trong WebView. Công cụ chạy từ nativeLibraryDir của ứng dụng: `/system/bin/sh`, `git`, `rg` đi kèm và runtime Bun được công khai là `bun`/`node`.
+
+- **Tải xuống**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **Build**: `./script/android/build-apk.sh` — xem [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **Lần chạy đầu**: cấp quyền truy cập tệp (phiên lưu trong `/sdcard/OpenCode` và tồn tại qua cài đặt lại), sau đó Cài đặt → Nhà cung cấp → kết nối nhà cung cấp và thêm dự án (`~/workspace`)
+- **Hoạt động**: máy chủ và giao diện web, phiên, git với diff và tô sáng cú pháp (Changes), trình duyệt tệp dự án (Files), bảng mức sử dụng ngữ cảnh (Usage), chạy lệnh và JS/TS
+- **Hạn chế**: không có terminal PTY, LSP/trình định dạng hay tiến trình MCP cục bộ; file watcher native không khả dụng (tìm kiếm dùng `rg`)
+- **Giấy phép**: MIT, giống bản gốc
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ OpenCode cũng có sẵn dưới dạng ứng dụng desktop. Tải trực tiế
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm`, hoặc AppImage      |
+
+### Ứng dụng di động (BETA)
+
+OpenCode cũng chạy trên Android dưới dạng APK native được build từ fork này. Ứng dụng chứa máy chủ thật và cùng giao diện web; phiên, khóa nhà cung cấp và dự án lưu trong `/sdcard/OpenCode` và tồn tại qua cài đặt lại.
+
+| Nền tảng | Tải xuống | Ghi chú |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — cấp quyền truy cập tệp ở lần chạy đầu |
+| Build từ mã nguồn | `./script/android/build-apk.sh` | xem [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

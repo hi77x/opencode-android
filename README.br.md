@@ -44,16 +44,26 @@
 
 ## opencode para Android
 
-Este fork traz uma compilação completa do opencode para Android: o servidor real, o agente, as sessões e a interface web original rodam localmente no celular. A interface é o bundle `packages/app` inalterado, servido via loopback dentro de um WebView. Sem PC, sem Termux, sem servidor remoto.
+Este fork executa o opencode existente de forma nativa no Android: o celular roda o servidor real, o agente, as sessões e a interface **inalterada** do `packages/app` (via loopback em um WebView). Sem PC, sem Termux, sem servidor remoto e sem mudanças de protocolo.
 
-No APK: o servidor opencode (build do Bun 1.4.2 para Android), git com diffs e realce de sintaxe, um navegador de arquivos do projeto, o painel de uso de contexto e execução de JS/TS pelo runtime Bun embutido (`bun`/`node`), além do ripgrep.
+O que nós adicionamos (todo o resto é opencode upstream):
 
-- **Download**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **Instalação**: `adb install -r app-release.apk`
-- **Build**: `./script/android/build-apk.sh`
-- **Primeira execução**: conecte um provedor em Configurações → Provedores e adicione um projeto (`~/workspace`).
-- **Limitações**: sem terminal PTY, sem LSP/formatadores, sem processos MCP locais; a busca usa `rg`.
-- **Licença**: MIT, como o original.
+| Caminho | Conteúdo |
+| --- | --- |
+| [`packages/android`](packages/android) | Host Android: projeto Gradle, activity WebView, servidor embutido, adaptações móveis da interface |
+| [`script/android`](script/android) | Build reproduzível: [`build-apk.sh`](script/android/build-apk.sh) e scripts para servidor, ripgrep, runtime do git e traduções |
+| [`docs/android`](docs/android) | Documentos técnicos: [build](docs/android/BUILD.md), [política de execução](docs/android/EXECUTION_POLICY.md), [dependências nativas](docs/android/NATIVE_DEPENDENCIES.md), [patches upstream](docs/android/UPSTREAM_PATCHES.md) |
+
+Apenas cinco arquivos upstream são modificados (alvo de build Android e compatibilidade de runtime); cada um é justificado em [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
+
+Como funciona: a activity inicia o servidor embutido (`libopencode.so serve --hostname=127.0.0.1`) e carrega `http://127.0.0.1:4096/` no WebView. As ferramentas rodam do diretório de bibliotecas nativas: `/system/bin/sh`, `git`, `rg` incluídos e um runtime Bun exposto como `bun`/`node`.
+
+- **Download**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **Build**: `./script/android/build-apk.sh` — veja [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **Primeira execução**: conceda acesso a arquivos (as sessões ficam em `/sdcard/OpenCode` e sobrevivem a reinstalações), depois Configurações → Provedores → conecte um provedor e adicione um projeto (`~/workspace`)
+- **Funciona**: servidor e interface web, sessões, git com diffs e realce de sintaxe (Changes), navegador de arquivos (Files), painel de uso de contexto (Usage), execução de comandos e JS/TS
+- **Limitações**: sem terminal PTY, sem LSP/formatadores, sem processos MCP locais; o file watcher nativo não está disponível (a busca usa `rg`)
+- **Licença**: MIT, como o original
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ O OpenCode também está disponível como aplicativo desktop. Baixe diretamente 
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm` ou AppImage         |
+
+### Aplicativo móvel (BETA)
+
+O OpenCode também roda no Android como APK nativa compilada deste fork. O app inclui o servidor real e a mesma interface web; sessões, chaves de provedores e projetos ficam em `/sdcard/OpenCode` e sobrevivem a reinstalações.
+
+| Plataforma | Download | Notas |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — conceda acesso a arquivos na primeira execução |
+| Compilar do código-fonte | `./script/android/build-apk.sh` | veja [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

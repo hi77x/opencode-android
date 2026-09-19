@@ -44,16 +44,26 @@
 
 ## Android için opencode
 
-Bu çatal, opencode'un eksiksiz bir Android derlemesini içerir: gerçek sunucu, ajan, oturumlar ve özgün web arayüzü telefonda yerel olarak çalışır. Arayüz, değiştirilmemiş `packages/app` paketidir ve WebView içinde loopback üzerinden sunulur. PC yok, Termux yok, uzak sunucu yok.
+Bu çatal, mevcut opencode'u Android'de yerel olarak çalıştırır: telefonda gerçek sunucu, ajan, oturumlar ve **değiştirilmemiş** `packages/app` web arayüzü (WebView içinde loopback üzerinden) çalışır. PC yok, Termux yok, uzak sunucu yok ve protokol değişikliği yok.
 
-APK içinde: opencode sunucusu (Android için Bun 1.4.2 derlemesi), diff ve sözdizimi vurgulamalı git, proje dosya tarayıcısı, bağlam kullanım paneli ve gömülü Bun çalışma zamanıyla (`bun`/`node`) JS/TS yürütme; ayrıca ripgrep.
+Upstream'e ek olarak bizim eklediklerimiz (geri kalan her şey upstream opencode):
 
-- **İndirme**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **Kurulum**: `adb install -r app-release.apk`
-- **Derleme**: `./script/android/build-apk.sh`
-- **İlk açılış**: Ayarlar → Sağlayıcılar bölümünden bir sağlayıcı bağlayın ve bir proje ekleyin (`~/workspace`).
-- **Sınırlamalar**: PTY terminali, LSP/biçimlendiriciler ve yerel MCP süreçleri yok; arama `rg` kullanır.
-- **Lisans**: MIT, orijinaliyle aynı.
+| Yol | İçerik |
+| --- | --- |
+| [`packages/android`](packages/android) | Android ana makinesi: Gradle projesi, WebView activity, gömülü sunucu, mobil arayüz uyarlamaları |
+| [`script/android`](script/android) | Tekrarlanabilir derleme: [`build-apk.sh`](script/android/build-apk.sh) ve sunucu, ripgrep, git çalışma zamanı ve çeviriler için betikler |
+| [`docs/android`](docs/android) | Teknik belgeler: [derleme](docs/android/BUILD.md), [yürütme politikası](docs/android/EXECUTION_POLICY.md), [yerel bağımlılıklar](docs/android/NATIVE_DEPENDENCIES.md), [upstream yamaları](docs/android/UPSTREAM_PATCHES.md) |
+
+Yalnızca beş upstream dosyası değiştirilir (Android derleme hedefi ve çalışma zamanı uyumluluğu); her biri gerekçesiyle [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md) içinde belgelenmiştir.
+
+Nasıl çalışır: activity gömülü sunucuyu başlatır (`libopencode.so serve --hostname=127.0.0.1`) ve WebView'de `http://127.0.0.1:4096/` adresini yükler. Araçlar uygulamanın yerel kitaplık dizininden çalışır: `/system/bin/sh`, paketlenmiş `git`, `rg` ve `bun`/`node` olarak sunulan Bun çalışma zamanı.
+
+- **İndirme**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **Derleme**: `./script/android/build-apk.sh` — bkz. [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **İlk açılış**: dosya erişimine izin verin (oturumlar `/sdcard/OpenCode` içinde tutulur ve yeniden kurulumdan sağ çıkar), sonra Ayarlar → Sağlayıcılar → bir sağlayıcı bağlayın ve proje ekleyin (`~/workspace`)
+- **Çalışır**: sunucu ve web arayüzü, oturumlar, diff ve sözdizimi vurgulamalı git (Changes), proje dosya tarayıcısı (Files), bağlam kullanım paneli (Usage), komut ve JS/TS yürütme
+- **Sınırlamalar**: PTY terminali, LSP/biçimlendiriciler ve yerel MCP süreçleri yok; yerel file watcher yok (arama `rg` kullanır)
+- **Lisans**: MIT, orijinaliyle aynı
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ OpenCode ayrıca masaüstü uygulaması olarak da mevcuttur. Doğrudan [sürüm 
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm` veya AppImage       |
+
+### Mobil Uygulama (BETA)
+
+OpenCode, bu çataldan derlenen yerel bir APK olarak Android'de de çalışır. Uygulama gerçek sunucuyu ve aynı web arayüzünü içerir; oturumlar, sağlayıcı anahtarları ve projeler `/sdcard/OpenCode` içinde tutulur ve yeniden kurulumdan sağ çıkar.
+
+| Platform | İndirme | Notlar |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — ilk açılışta dosya erişimine izin verin |
+| Kaynaktan derleme | `./script/android/build-apk.sh` | bkz. [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

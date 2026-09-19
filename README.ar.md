@@ -44,16 +44,26 @@
 
 ## opencode لنظام Android
 
-توفّر هذه النسخة بناءً كاملاً لنظام Android: الخادم الحقيقي والوكيل والجلسات وواجهة الويب الأصلية تعمل محلياً على الهاتف. الواجهة هي حزمة `packages/app` دون تغيير، تُقدَّم عبر loopback داخل WebView. بلا حاسوب، وبلا Termux، وبلا خادم بعيد.
+يشغّل هذا التفرّع نسخة opencode الحالية أصلياً على Android: الهاتف يشغّل الخادم الحقيقي والوكيل والجلسات وواجهة `packages/app` **دون تغيير** (عبر loopback داخل WebView). بلا حاسوب، وبلا Termux، وبلا خادم بعيد، ودون أي تغيير في البروتوكول.
 
-داخل ملف APK: خادم opencode (بناء Bun 1.4.2 لنظام Android)، وgit مع الفروقات وتلوين الصياغة، ومتصفح ملفات المشروع، ولوحة استخدام السياق، وتنفيذ JS/TS عبر Bun المضمّن (`bun`/`node`)، إضافة إلى ripgrep.
+ما أضفناه فوق upstream (وكل ما تبقى هو opencode الأصلي):
 
-- **التنزيل**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **التثبيت**: `adb install -r app-release.apk`
-- **البناء**: `./script/android/build-apk.sh`
-- **أول تشغيل**: اربط مزوّداً من الإعدادات ← المزوّدون وأضف مشروعاً (`~/workspace`).
-- **القيود**: لا طرفية PTY ولا LSP/منسّقات ولا عمليات MCP محلية؛ البحث يستخدم `rg`.
-- **الترخيص**: MIT كما الأصل.
+| المسار | المحتوى |
+| --- | --- |
+| [`packages/android`](packages/android) | مضيف Android: مشروع Gradle، نشاط WebView، خادم مضمّن، تكييف الواجهة للجوال |
+| [`script/android`](script/android) | بناء قابل لإعادة الإنتاج: [`build-apk.sh`](script/android/build-apk.sh) مع سكربتات الخادم وripgrep وزمن تشغيل git والترجمات |
+| [`docs/android`](docs/android) | وثائق هندسية: [البناء](docs/android/BUILD.md)، [سياسة التنفيذ](docs/android/EXECUTION_POLICY.md)، [الاعتماديات الأصلية](docs/android/NATIVE_DEPENDENCIES.md)، [رقع upstream](docs/android/UPSTREAM_PATCHES.md) |
+
+تم تعديل خمسة ملفات upstream فقط (هدف بناء Android وتوافق زمن التشغيل)، وكل تعديل موثّق مع سببه في [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
+
+كيف يعمل: يبدأ النشاط الخادم المضمّن (`libopencode.so serve --hostname=127.0.0.1`) ويحمّل `http://127.0.0.1:4096/` في WebView. تعمل الأدوات من مجلد المكتبات الأصلية للتطبيق: `/system/bin/sh` و`git` و`rg` المضمّنة وزمن تشغيل Bun المكشوف باسم `bun`/`node`.
+
+- **التنزيل**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`، arm64، Android 8.0+)
+- **البناء**: `./script/android/build-apk.sh` — راجع [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **أول تشغيل**: امنح الوصول إلى الملفات (تُحفظ الجلسات في `/sdcard/OpenCode` وتبقى بعد إعادة التثبيت)، ثم الإعدادات ← المزوّدون ← اربط مزوّداً وأضف مشروعاً (`~/workspace`)
+- **يعمل**: الخادم وواجهة الويب، الجلسات، git مع الفروقات وتلوين الصياغة (Changes)، متصفح ملفات المشروع (Files)، لوحة استخدام السياق (Usage)، تنفيذ الأوامر وJS/TS
+- **القيود**: لا طرفية PTY ولا LSP/منسّقات ولا عمليات MCP محلية؛ مراقب الملفات الأصلي غير متاح (البحث يستخدم `rg`)
+- **الترخيص**: MIT كما الأصل
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ nix run nixpkgs#opencode           # او github:anomalyco/opencode لاحدث �
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb` او `.rpm` او AppImage       |
+
+### تطبيق الجوال (BETA)
+
+يعمل OpenCode أيضاً على Android كملف APK أصلي مبني من هذا التفرّع. يحتوي التطبيق على الخادم الحقيقي ونفس واجهة الويب؛ تُحفظ الجلسات ومفاتيح المزوّدين والمشاريع في `/sdcard/OpenCode` وتبقى بعد إعادة التثبيت.
+
+| المنصة | التنزيل | ملاحظات |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — امنح الوصول إلى الملفات عند أول تشغيل |
+| البناء من المصدر | `./script/android/build-apk.sh` | راجع [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

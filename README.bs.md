@@ -44,16 +44,26 @@
 
 ## opencode za Android
 
-Ovaj fork donosi potpunu Android gradnju opencode-a: pravi server, agent, sesije i originalni web interfejs rade lokalno na telefonu. Interfejs je neizmijenjeni `packages/app` bundle, poslužen preko loopback-a u WebView-u. Bez PC-a, bez Termux-a, bez udaljenog servera.
+Ovaj fork pokreće postojeći opencode nativno na Androidu: telefon izvršava pravi server, agenta, sesije i **nepromijenjeni** `packages/app` web interfejs (preko loopback-a u WebView-u). Bez PC-a, bez Termux-a, bez udaljenog servera i bez promjena protokola.
 
-U APK-u: opencode server (Bun 1.4.2 gradnja za Android), git sa diffovima i isticanjem sintakse, preglednik datoteka projekta, panel potrošnje konteksta i izvršavanje JS/TS preko ugrađenog Bun runtime-a (`bun`/`node`), uz ripgrep.
+Šta smo mi dodali (sve ostalo je upstream opencode):
 
-- **Preuzmi**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **Instalacija**: `adb install -r app-release.apk`
-- **Gradnja**: `./script/android/build-apk.sh`
-- **Prvo pokretanje**: povežite provajdera u Postavke → Provajderi i dodajte projekat (`~/workspace`).
-- **Ograničenja**: nema PTY terminala, LSP/formatera ni lokalnih MCP procesa; pretraga koristi `rg`.
-- **Licenca**: MIT, kao i original.
+| Putanja | Sadržaj |
+| --- | --- |
+| [`packages/android`](packages/android) | Android host: Gradle projekat, WebView activity, ugrađeni server, prilagođavanje mobilnog UI-a |
+| [`script/android`](script/android) | Ponovljiv build: [`build-apk.sh`](script/android/build-apk.sh) i skripte za server, ripgrep, git runtime i prijevode |
+| [`docs/android`](docs/android) | Tehnička dokumentacija: [build](docs/android/BUILD.md), [pravila izvršavanja](docs/android/EXECUTION_POLICY.md), [nativne zavisnosti](docs/android/NATIVE_DEPENDENCIES.md), [upstream zakrpe](docs/android/UPSTREAM_PATCHES.md) |
+
+Mijenja se samo pet upstream datoteka (Android build cilj i kompatibilnost runtime-a); svaka je dokumentovana s razlogom u [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
+
+Kako radi: activity pokreće ugrađeni server (`libopencode.so serve --hostname=127.0.0.1`) i učitava `http://127.0.0.1:4096/` u WebView. Alati se izvršavaju iz nativeLibraryDir-a aplikacije: `/system/bin/sh`, ugrađeni `git`, `rg` i Bun runtime izložen kao `bun`/`node`.
+
+- **Preuzmi**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **Build**: `./script/android/build-apk.sh` — vidi [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **Prvo pokretanje**: odobrite pristup datotekama (sesije su u `/sdcard/OpenCode` i preživljavaju reinstalaciju), zatim Postavke → Provajderi → povežite provajdera i dodajte projekat (`~/workspace`)
+- **Radi**: server i web UI, sesije, git s diffovima i isticanjem sintakse (Changes), preglednik datoteka projekta (Files), panel potrošnje konteksta (Usage), izvršavanje komandi i JS/TS
+- **Ograničenja**: nema PTY terminala, LSP/formatera ni lokalnih MCP procesa; nativni file watcher nije dostupan (pretraga koristi `rg`)
+- **Licenca**: MIT, kao i original
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ OpenCode je dostupan i kao desktop aplikacija. Preuzmi je direktno sa [stranice 
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm`, ili AppImage       |
+
+### Mobilna aplikacija (BETA)
+
+OpenCode radi i na Androidu kao nativni APK izgrađen iz ovog forka. Aplikacija sadrži pravi server i isti web UI; sesije, ključevi provajdera i projekti su u `/sdcard/OpenCode` i preživljavaju reinstalaciju.
+
+| Platforma | Preuzimanje | Napomene |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — odobrite pristup datotekama pri prvom pokretanju |
+| Build iz izvornog koda | `./script/android/build-apk.sh` | vidi [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

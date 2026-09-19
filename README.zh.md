@@ -44,16 +44,26 @@
 
 ## opencode Android 版
 
-本分支提供完整的 opencode Android 构建：真实的服务器、Agent、会话以及原始 Web 界面都在手机上本地运行。界面是未经修改的 `packages/app` 包，通过 loopback 在 WebView 中打开。无需电脑、Termux 或远程服务器。
+本分支让现有的 opencode 在 Android 上原生运行：手机本地运行真正的服务器、Agent、会话以及**未经修改**的 `packages/app` Web 界面（通过 WebView 里的 loopback 访问）。无需电脑、Termux、远程服务器，也不改动协议。
 
-APK 内含：opencode 服务器（面向 Android 的 Bun 1.4.2 构建）、带差异与语法高亮的 git、项目文件浏览器、上下文用量面板，以及通过内置 Bun 运行时（`bun`/`node`）执行 JS/TS，另含 ripgrep。
+我们在上游之上新增的内容（其余都是上游 opencode）：
 
-- **下载**：[releases](https://github.com/hi77x/opencode-android/releases)（`app-release.apk`）
-- **安装**：`adb install -r app-release.apk`
-- **构建**：`./script/android/build-apk.sh`
-- **首次启动**：在 设置 → 提供商 中连接提供商，并添加项目（`~/workspace`）。
-- **限制**：没有 PTY 终端、LSP/格式化工具和本地 MCP 进程；搜索使用 `rg`。
-- **许可证**：MIT，与原项目相同。
+| 路径 | 内容 |
+| --- | --- |
+| [`packages/android`](packages/android) | Android 宿主：Gradle 工程、WebView Activity、内嵌服务器、移动端界面适配 |
+| [`script/android`](script/android) | 可复现构建：[`build-apk.sh`](script/android/build-apk.sh) 以及服务器、ripgrep、git 运行时和翻译脚本 |
+| [`docs/android`](docs/android) | 工程文档：[构建](docs/android/BUILD.md)、[执行策略](docs/android/EXECUTION_POLICY.md)、[原生依赖](docs/android/NATIVE_DEPENDENCIES.md)、[上游补丁](docs/android/UPSTREAM_PATCHES.md) |
+
+只修改了五个上游文件（Android 构建目标和运行时兼容性）；每个改动及原因都记录在 [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md)。
+
+工作原理：Activity 启动内嵌服务器（`libopencode.so serve --hostname=127.0.0.1`），并在 WebView 中加载 `http://127.0.0.1:4096/`。工具从应用的 nativeLibraryDir 运行：`/system/bin/sh`、内置 `git`、`rg`，以及以 `bun`/`node` 暴露的 Bun 运行时。
+
+- **下载**：[releases](https://github.com/hi77x/opencode-android/releases)（`app-release.apk`，arm64，Android 8.0+）
+- **构建**：`./script/android/build-apk.sh` — 参见 [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **首次启动**：授予文件访问权限（会话保存在 `/sdcard/OpenCode`，重装后仍保留），然后在 设置 → 提供商 中连接提供商并添加项目（`~/workspace`）
+- **可用**：服务器与 Web 界面、会话、带语法高亮差异的 git（Changes）、项目文件浏览器（Files）、上下文用量面板（Usage）、命令与 JS/TS 执行
+- **限制**：没有 PTY 终端、LSP/格式化工具和本地 MCP 进程；原生 file watcher 不可用（搜索使用 `rg`）
+- **许可证**：MIT，与原项目相同
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ OpenCode 也提供桌面版应用。可直接从 [发布页 (releases page)](htt
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`、`.rpm` 或 AppImage         |
+
+### 移动应用（BETA）
+
+OpenCode 也能在 Android 上以本分支构建的原生 APK 运行。应用内含真正的服务器和同一个 Web 界面；会话、提供商密钥和项目保存在 `/sdcard/OpenCode`，重装后仍然保留。
+
+| 平台 | 下载 | 说明 |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — 首次启动时授予文件访问权限 |
+| 从源码构建 | `./script/android/build-apk.sh` | 参见 [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew Cask)

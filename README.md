@@ -44,16 +44,26 @@
 
 ## opencode for Android
 
-This fork ships a complete Android build of opencode: the real server, agent, sessions and the original web UI run locally on the phone. The UI is the unchanged `packages/app` bundle served over loopback inside a WebView — no PC, no Termux, no remote server.
+This fork makes the existing opencode run natively on Android: the phone runs the real server, the agent, sessions and the **unchanged** `packages/app` web UI (served over loopback in a WebView). No PC, no Termux, no remote server, no protocol changes.
 
-Inside the APK: the opencode server (Bun 1.4.2 Android build), git with syntax-highlighted diffs, a project file browser, the context-usage panel, and JS/TS execution through a bundled Bun runtime (`bun`/`node`), plus ripgrep.
+What we added on top of upstream (everything else is upstream opencode):
 
-- **Download**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **Install**: `adb install -r app-release.apk`
-- **Build**: `./script/android/build-apk.sh`
-- **First launch**: connect a provider in Settings → Providers and add a project (`~/workspace`).
-- **Limitations**: no PTY terminal, no LSP/formatters, no local MCP processes; search uses `rg`.
-- **License**: MIT, same as upstream.
+| Path | Contents |
+| --- | --- |
+| [`packages/android`](packages/android) | Android host: Gradle project, WebView activity, embedded server manager, mobile UI adaptations |
+| [`script/android`](script/android) | Reproducible build: [`build-apk.sh`](script/android/build-apk.sh) plus helpers for the server, ripgrep, git runtime and translations |
+| [`docs/android`](docs/android) | Engineering docs: [build](docs/android/BUILD.md), [execution policy](docs/android/EXECUTION_POLICY.md), [native dependencies](docs/android/NATIVE_DEPENDENCIES.md), [upstream patches](docs/android/UPSTREAM_PATCHES.md) |
+
+Only five upstream files are modified (Android build target plus runtime compatibility); each change is documented with its reason in [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
+
+How it works: the Android activity starts the bundled server (`libopencode.so serve --hostname=127.0.0.1`) and loads `http://127.0.0.1:4096/` in a WebView. Tools run from the app's native library directory: `/system/bin/sh`, bundled `git`, `rg`, and a Bun runtime exposed as `bun`/`node`.
+
+- **Download**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **Build**: `./script/android/build-apk.sh` — see [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **First launch**: grant file access (sessions live in `/sdcard/OpenCode` and survive reinstalls), then Settings → Providers → connect a provider and add a project (`~/workspace`)
+- **Works**: server and web UI, sessions, git with syntax-highlighted diffs (Changes), project file browser (Files), context-usage panel (Usage), command and JS/TS execution
+- **Limitations**: no PTY terminal, no LSP or formatters, no local MCP processes; the native file-watcher binding is unavailable (search uses `rg`)
+- **License**: MIT, same as upstream
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ OpenCode is also available as a desktop application. Download directly from the 
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm`, or `.AppImage`     |
+
+### Mobile App (BETA)
+
+OpenCode also runs on Android as a native APK built from this fork. The app bundles the real server and the same web UI; sessions, provider keys and projects live in `/sdcard/OpenCode` and survive reinstalls.
+
+| Platform | Download | Notes |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA - grant file access on first launch |
+| Build from source | `./script/android/build-apk.sh` | see [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

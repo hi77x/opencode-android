@@ -44,16 +44,26 @@
 
 ## Android 版 opencode
 
-このフォークには完全な Android ビルドが含まれます。本物のサーバー、エージェント、セッション、オリジナルの Web UI がスマートフォン上でローカルに動作します。UI は変更していない `packages/app` バンドルで、WebView 内の loopback 経由で配信されます。PC も Termux もリモートサーバーも不要です。
+このフォークは既存の opencode を Android 上でネイティブに動かします。スマートフォン上で本物のサーバー、エージェント、セッション、そして**変更していない** `packages/app` の Web UI（WebView 内の loopback 経由）が動作します。PC も Termux もリモートサーバーも不要で、プロトコルの変更もありません。
 
-APK には、opencode サーバー（Android 向け Bun 1.4.2 ビルド）、差分とシンタックスハイライト付きの git、プロジェクトのファイルブラウザ、コンテキスト使用量パネル、同梱の Bun ランタイム（`bun`/`node`）による JS/TS 実行、そして ripgrep が含まれます。
+私たちが upstream に追加したもの（それ以外はすべて upstream の opencode です）:
 
-- **ダウンロード**: [releases](https://github.com/hi77x/opencode-android/releases)（`app-release.apk`）
-- **インストール**: `adb install -r app-release.apk`
-- **ビルド**: `./script/android/build-apk.sh`
-- **初回起動**: 設定 → プロバイダー でプロバイダーを接続し、プロジェクト（`~/workspace`）を追加します。
-- **制限**: PTY ターミナル、LSP／フォーマッター、ローカル MCP プロセスは未対応。検索は `rg` を使用します。
-- **ライセンス**: MIT（オリジナルと同じ）。
+| パス | 内容 |
+| --- | --- |
+| [`packages/android`](packages/android) | Android ホスト: Gradle プロジェクト、WebView Activity、内蔵サーバー、モバイル UI 調整 |
+| [`script/android`](script/android) | 再現可能なビルド: [`build-apk.sh`](script/android/build-apk.sh) と、サーバー、ripgrep、git ランタイム、翻訳のスクリプト |
+| [`docs/android`](docs/android) | 技術ドキュメント: [ビルド](docs/android/BUILD.md)、[実行ポリシー](docs/android/EXECUTION_POLICY.md)、[ネイティブ依存](docs/android/NATIVE_DEPENDENCIES.md)、[upstream パッチ](docs/android/UPSTREAM_PATCHES.md) |
+
+変更する upstream ファイルは 5 つだけです（Android ビルドターゲットとランタイム互換性）。それぞれ理由を [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md) に記載しています。
+
+仕組み: Activity が内蔵サーバーを起動し（`libopencode.so serve --hostname=127.0.0.1`）、WebView で `http://127.0.0.1:4096/` を読み込みます。ツールはアプリの nativeLibraryDir から実行されます: `/system/bin/sh`、同梱の `git`、`rg`、そして `bun`/`node` として公開される Bun ランタイム。
+
+- **ダウンロード**: [releases](https://github.com/hi77x/opencode-android/releases)（`app-release.apk`、arm64、Android 8.0+）
+- **ビルド**: `./script/android/build-apk.sh` — [`docs/android/BUILD.md`](docs/android/BUILD.md) を参照
+- **初回起動**: ファイルアクセスを許可（セッションは `/sdcard/OpenCode` に保存され、再インストール後も残ります）。次に 設定 → プロバイダー でプロバイダーを接続し、プロジェクト（`~/workspace`）を追加します
+- **動作する**: サーバーと Web UI、セッション、差分とシンタックスハイライト付きの git（Changes）、プロジェクトファイルブラウザ（Files）、コンテキスト使用量パネル（Usage）、コマンドと JS/TS の実行
+- **制限**: PTY ターミナル、LSP／フォーマッター、ローカル MCP プロセスはなし。ネイティブ file watcher は利用不可（検索は `rg` を使用）
+- **ライセンス**: MIT（オリジナルと同じ）
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ OpenCode はデスクトップアプリとしても利用できます。[release
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`、`.rpm`、または AppImage    |
+
+### モバイルアプリ (BETA)
+
+OpenCode はこのフォークからビルドしたネイティブ APK として Android でも動作します。本物のサーバーと同じ Web UI を同梱し、セッション、プロバイダーキー、プロジェクトは `/sdcard/OpenCode` に保存されて再インストール後も残ります。
+
+| プラットフォーム | ダウンロード | 備考 |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — 初回起動時にファイルアクセスを許可 |
+| ソースからビルド | `./script/android/build-apk.sh` | [`packages/android/README.md`](packages/android/README.md) を参照 |
 
 ```bash
 # macOS (Homebrew)

@@ -44,16 +44,26 @@
 
 ## opencode for Android
 
-Denne forken inneholder et komplett Android-bygg av opencode: den ekte serveren, agenten, sesjonene og det originale webgrensesnittet kjører lokalt på telefonen. Grensesnittet er den uendrede `packages/app`-bunten, servert via loopback i en WebView. Ingen PC, ingen Termux, ingen ekstern server.
+Denne forken kjører eksisterende opencode nativt på Android: telefonen kjører den ekte serveren, agenten, sesjonene og det **uendrede** `packages/app`-grensesnittet (via loopback i en WebView). Ingen PC, ingen Termux, ingen ekstern server og ingen protokollendringer.
 
-I APK-en: opencode-serveren (Bun 1.4.2 for Android), git med differ og syntaksmarkering, en prosjektfilutforsker, panelet for kontekstbruk og JS/TS-kjøring via den innebygde Bun-runtime (`bun`/`node`), i tillegg til ripgrep.
+Det vi selv har lagt til (alt annet er upstream opencode):
 
-- **Last ned**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **Installer**: `adb install -r app-release.apk`
-- **Bygg**: `./script/android/build-apk.sh`
-- **Første oppstart**: koble til en leverandør under Innstillinger → Leverandører og legg til et prosjekt (`~/workspace`).
-- **Begrensninger**: ingen PTY-terminal, LSP/formaterere eller lokale MCP-prosesser; søk bruker `rg`.
-- **Lisens**: MIT, som originalen.
+| Sti | Innhold |
+| --- | --- |
+| [`packages/android`](packages/android) | Android-host: Gradle-prosjekt, WebView-activity, innebygd server, mobile UI-tilpasninger |
+| [`script/android`](script/android) | Reproduserbart bygg: [`build-apk.sh`](script/android/build-apk.sh) og hjelpere for server, ripgrep, git-runtime og oversettelser |
+| [`docs/android`](docs/android) | Teknisk dokumentasjon: [bygg](docs/android/BUILD.md), [execution policy](docs/android/EXECUTION_POLICY.md), [native avhengigheter](docs/android/NATIVE_DEPENDENCIES.md), [upstream-patches](docs/android/UPSTREAM_PATCHES.md) |
+
+Bare fem upstream-filer endres (Android-byggmål og runtime-kompatibilitet); hver endring er begrunnet i [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
+
+Slik virker det: activityen starter den innebygde serveren (`libopencode.so serve --hostname=127.0.0.1`) og laster `http://127.0.0.1:4096/` i en WebView. Verktøy kjøres fra appens native bibliotekmappe: `/system/bin/sh`, medfølgende `git`, `rg` og en Bun-runtime som `bun`/`node`.
+
+- **Last ned**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **Bygg**: `./script/android/build-apk.sh` — se [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **Første oppstart**: gi filtilgang (sesjoner ligger i `/sdcard/OpenCode` og overlever reinstallering), deretter Innstillinger → Leverandører → koble til en leverandør og legg til et prosjekt (`~/workspace`)
+- **Virker**: server og webgrensesnitt, sesjoner, git med differ og syntaksmarkering (Changes), prosjektfilutforsker (Files), kontekstforbrukspanel (Usage), kommando- og JS/TS-kjøring
+- **Begrensninger**: ingen PTY-terminal, LSP/formaterere eller lokale MCP-prosesser; den native file watcher mangler (søk bruker `rg`)
+- **Lisens**: MIT, som originalen
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ OpenCode er også tilgjengelig som en desktop-app. Last ned direkte fra [release
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm` eller AppImage      |
+
+### Mobilapp (BETA)
+
+OpenCode kjører også på Android som en native APK bygget fra denne forken. Appen inneholder den ekte serveren og samme webgrensesnitt; sesjoner, leverandørnøkler og prosjekter ligger i `/sdcard/OpenCode` og overlever reinstallering.
+
+| Plattform | Nedlasting | Merknader |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — gi filtilgang ved første oppstart |
+| Bygg fra kildekode | `./script/android/build-apk.sh` | se [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

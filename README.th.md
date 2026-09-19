@@ -44,15 +44,25 @@
 
 ## opencode สำหรับ Android
 
-ฟอร์กนี้มาพร้อมบิลด์ Android แบบครบชุดของ opencode: เซิร์ฟเวอร์จริง เอเจนต์ เซสชัน และเว็บอินเทอร์เฟซต้นฉบับทำงานบนโทรศัพท์โดยตรง UI คือบันเดิล `packages/app` ที่ไม่ได้แก้ไข เปิดผ่าน loopback ใน WebView ไม่ต้องใช้พีซี ไม่ต้องใช้ Termux และไม่ต้องมีเซิร์ฟเวอร์ระยะไกล
+ฟอร์กนี้รัน opencode ที่มีอยู่แบบเนทีฟบน Android: โทรศัพท์รันเซิร์ฟเวอร์จริง เอเจนต์ เซสชัน และอินเทอร์เฟซ `packages/app` ที่**ไม่ได้แก้ไข** (ผ่าน loopback ใน WebView) ไม่ต้องใช้พีซี, Termux, เซิร์ฟเวอร์ระยะไกล และไม่มีการเปลี่ยนโปรโตคอล
 
-ภายใน APK: เซิร์ฟเวอร์ opencode (บิลด์ Bun 1.4.2 สำหรับ Android), git พร้อม diff และการไฮไลต์ไวยากรณ์, ตัวเรียกดูไฟล์โปรเจกต์, แผงการใช้บริบท และการรัน JS/TS ผ่านรันไทม์ Bun ที่มาพร้อม (`bun`/`node`) รวมถึง ripgrep
+สิ่งที่เราเพิ่มจาก upstream (ที่เหลือคือ opencode upstream ทั้งหมด):
 
-- **ดาวน์โหลด**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **ติดตั้ง**: `adb install -r app-release.apk`
-- **บิลด์**: `./script/android/build-apk.sh`
-- **เปิดครั้งแรก**: เชื่อมต่อผู้ให้บริการใน การตั้งค่า → ผู้ให้บริการ และเพิ่มโปรเจกต์ (`~/workspace`)
-- **ข้อจำกัด**: ไม่มีเทอร์มินัล PTY, LSP/ตัวจัดรูปแบบ และโปรเซส MCP ภายในเครื่อง; การค้นหาใช้ `rg`
+| พาธ | เนื้อหา |
+| --- | --- |
+| [`packages/android`](packages/android) | โฮสต์ Android: โปรเจกต์ Gradle, Activity ของ WebView, เซิร์ฟเวอร์ฝังตัว, การปรับ UI สำหรับมือถือ |
+| [`script/android`](script/android) | บิลด์ที่ทำซ้ำได้: [`build-apk.sh`](script/android/build-apk.sh) พร้อมสคริปต์สำหรับเซิร์ฟเวอร์, ripgrep, รันไทม์ git และคำแปล |
+| [`docs/android`](docs/android) | เอกสารวิศวกรรม: [บิลด์](docs/android/BUILD.md), [นโยบายการรัน](docs/android/EXECUTION_POLICY.md), [ไดรเวอร์ภายนอก](docs/android/NATIVE_DEPENDENCIES.md), [แพตช์ upstream](docs/android/UPSTREAM_PATCHES.md) |
+
+มีเพียงห้าไฟล์ upstream ที่ถูกแก้ไข (เป้าหมายบิลด์ Android และความเข้ากันได้ของรันไทม์) แต่ละอย่างมีเหตุผลใน [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md)
+
+วิธีการทำงาน: Activity เริ่มเซิร์ฟเวอร์ฝังตัว (`libopencode.so serve --hostname=127.0.0.1`) และโหลด `http://127.0.0.1:4096/` ใน WebView เครื่องมือรันจาก nativeLibraryDir ของแอป: `/system/bin/sh`, `git`, `rg` ที่แนบมา และรันไทม์ Bun ที่เปิดเป็น `bun`/`node`
+
+- **ดาวน์โหลด**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **บิลด์**: `./script/android/build-apk.sh` — ดู [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **เปิดครั้งแรก**: อนุญาตการเข้าถึงไฟล์ (เซสชันเก็บใน `/sdcard/OpenCode` และอยู่รอดหลังติดตั้งใหม่) จากนั้น การตั้งค่า → ผู้ให้บริการ → เชื่อมต่อผู้ให้บริการและเพิ่มโปรเจกต์ (`~/workspace`)
+- **ทำงานได้**: เซิร์ฟเวอร์และเว็บ UI, เซสชัน, git พร้อม diff และไฮไลต์ไวยากรณ์ (Changes), ตัวเรียกดูไฟล์โปรเจกต์ (Files), แผงการใช้บริบท (Usage), การรันคำสั่งและ JS/TS
+- **ข้อจำกัด**: ไม่มีเทอร์มินัล PTY, LSP/ตัวจัดรูปแบบ และโปรเซส MCP ภายในเครื่อง; file watcher แบบเนทีฟใช้ไม่ได้ (ค้นหาด้วย `rg`)
 - **สัญญาอนุญาต**: MIT เช่นเดียวกับต้นฉบับ
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
@@ -90,6 +100,15 @@ OpenCode มีให้ใช้งานเป็นแอปพลิเค�
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm`, หรือ AppImage      |
+
+### แอปมือถือ (BETA)
+
+OpenCode ทำงานบน Android เป็น APK เนทีฟที่บิลด์จากฟอร์กนี้ แอปมีเซิร์ฟเวอร์จริงและเว็บ UI เดียวกัน; เซสชัน คีย์ผู้ให้บริการ และโปรเจกต์เก็บใน `/sdcard/OpenCode` และอยู่รอดหลังติดตั้งใหม่
+
+| แพลตฟอร์ม | ดาวน์โหลด | หมายเหตุ |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — อนุญาตการเข้าถึงไฟล์เมื่อเปิดครั้งแรก |
+| บิลด์จากซอร์ส | `./script/android/build-apk.sh` | ดู [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

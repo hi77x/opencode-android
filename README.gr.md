@@ -44,16 +44,26 @@
 
 ## opencode για Android
 
-Αυτό το fork περιλαμβάνει πλήρες Android build του opencode: ο πραγματικός server, ο agent, οι συνεδρίες και το αρχικό web UI εκτελούνται τοπικά στο τηλέφωνο. Το UI είναι το αμετάβλητο bundle `packages/app`, που σερβίρεται μέσω loopback σε WebView. Χωρίς PC, χωρίς Termux, χωρίς απομακρυσμένο server.
+Αυτό το fork εκτελεί το υπάρχον opencode εγγενώς στο Android: το τηλέφωνο τρέχει τον πραγματικό server, τον agent, τις συνεδρίες και το **αμετάβλητο** web UI του `packages/app` (μέσω loopback σε WebView). Χωρίς PC, χωρίς Termux, χωρίς απομακρυσμένο server και χωρίς αλλαγές στο πρωτόκολλο.
 
-Στο APK: ο server του opencode (build Bun 1.4.2 για Android), git με diff και επισήμανση σύνταξης, περιηγητής αρχείων έργου, πίνακας χρήσης περιβάλλοντος και εκτέλεση JS/TS μέσω της ενσωματωμένης runtime Bun (`bun`/`node`), καθώς και ripgrep.
+Τι προσθέσαμε εμείς (όλα τα υπόλοιπα είναι upstream opencode):
 
-- **Λήψη**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **Εγκατάσταση**: `adb install -r app-release.apk`
-- **Build**: `./script/android/build-apk.sh`
-- **Πρώτη εκκίνηση**: συνδέστε πάροχο στις Ρυθμίσεις → Πάροχοι και προσθέστε έργο (`~/workspace`).
-- **Περιορισμοί**: χωρίς τερματικό PTY, LSP/formatters και τοπικές διεργασίες MCP· η αναζήτηση χρησιμοποιεί `rg`.
-- **Άδεια**: MIT, όπως στο αρχικό.
+| Διαδρομή | Περιεχόμενο |
+| --- | --- |
+| [`packages/android`](packages/android) | Android host: project Gradle, Activity WebView, ενσωματωμένος server, προσαρμογές mobile UI |
+| [`script/android`](script/android) | Αναπαραγώγιμο build: [`build-apk.sh`](script/android/build-apk.sh) και scripts για server, ripgrep, runtime git και μεταφράσεις |
+| [`docs/android`](docs/android) | Τεχνικά έγγραφα: [build](docs/android/BUILD.md), [πολιτική εκτέλεσης](docs/android/EXECUTION_POLICY.md), [native εξαρτήσεις](docs/android/NATIVE_DEPENDENCIES.md), [patches upstream](docs/android/UPSTREAM_PATCHES.md) |
+
+Τροποποιούνται μόνο πέντε αρχεία upstream (στόχος build Android και συμβατότητα runtime); καθένα τεκμηριώνεται με την αιτία του στο [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
+
+Πώς λειτουργεί: η Activity ξεκινά τον ενσωματωμένο server (`libopencode.so serve --hostname=127.0.0.1`) και φορτώνει το `http://127.0.0.1:4096/` σε WebView. Τα εργαλεία εκτελούνται από τον nativeLibraryDir της εφαρμογής: `/system/bin/sh`, ενσωματωμένα `git`, `rg` και runtime Bun ως `bun`/`node`.
+
+- **Λήψη**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **Build**: `./script/android/build-apk.sh` — δείτε [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **Πρώτη εκκίνηση**: δώστε πρόσβαση στα αρχεία (οι συνεδρίες βρίσκονται στο `/sdcard/OpenCode` και επιβιώνουν από επανεγκατάσταση), μετά Ρυθμίσεις → Πάροχοι → συνδέστε πάροχο και προσθέστε έργο (`~/workspace`)
+- **Λειτουργεί**: server και web UI, συνεδρίες, git με diffs και επισήμανση σύνταξης (Changes), περιηγητής αρχείων (Files), πίνακας χρήσης περιβάλλοντος (Usage), εκτέλεση εντολών και JS/TS
+- **Περιορισμοί**: χωρίς τερματικό PTY, LSP/formatters και τοπικές διεργασίες MCP· ο native file watcher δεν είναι διαθέσιμος (η αναζήτηση χρησιμοποιεί `rg`)
+- **Άδεια**: MIT, όπως στο αρχικό
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ nix run nixpkgs#opencode           # ή github:anomalyco/opencode με βάση 
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm`, ή AppImage         |
+
+### Εφαρμογή για κινητά (BETA)
+
+Το OpenCode λειτουργεί επίσης σε Android ως εγγενές APK που χτίζεται από αυτό το fork. Η εφαρμογή περιλαμβάνει τον πραγματικό server και το ίδιο web UI· οι συνεδρίες, τα κλειδιά παρόχων και τα έργα βρίσκονται στο `/sdcard/OpenCode` και επιβιώνουν από επανεγκατάσταση.
+
+| Πλατφόρμα | Λήψη | Σημειώσεις |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — δώστε πρόσβαση στα αρχεία στην πρώτη εκκίνηση |
+| Build από πηγαίο κώδικα | `./script/android/build-apk.sh` | δείτε [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

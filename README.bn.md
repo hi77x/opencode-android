@@ -44,16 +44,26 @@
 
 ## Android-এর জন্য opencode
 
-এই ফর্কে opencode-এর সম্পূর্ণ Android বিল্ড রয়েছে: আসল সার্ভার, এজেন্ট, সেশন এবং মূল ওয়েব ইন্টারফেস ফোনেই লোকালি চলে। ইন্টারফেসটি অপরিবর্তিত `packages/app` বান্ডল, WebView-এ loopback দিয়ে পরিবেশিত। পিসি, Termux বা দূরবর্তী সার্ভার লাগে না।
+এই ফর্কটি বিদ্যমান opencode-কে Android-এ নেটিভভাবে চালায়: ফোনে আসল সার্ভার, এজেন্ট, সেশন এবং **অপরিবর্তিত** `packages/app` ওয়েব ইন্টারফেস (WebView-এ loopback-এর মাধ্যমে) চলে। পিসি, Termux বা দূরবর্তী সার্ভার লাগে না এবং প্রোটোকল বদলানো হয় না।
 
-APK-তে আছে: opencode সার্ভার (Android-এর জন্য Bun 1.4.2 বিল্ড), diff ও সিনট্যাক্স হাইলাইটসহ git, প্রকল্পের ফাইল ব্রাউজার, কনটেক্সট ব্যবহারের প্যানেল এবং বিল্ট-ইন Bun রানটাইম (`bun`/`node`) দিয়ে JS/TS চালানো, সাথে ripgrep।
+আমরা upstream-এর উপরে যা যোগ করেছি (বাকি সব upstream opencode):
 
-- **ডাউনলোড**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **ইনস্টল**: `adb install -r app-release.apk`
-- **বিল্ড**: `./script/android/build-apk.sh`
-- **প্রথম চালু**: সেটিংস → প্রোভাইডার-এ প্রোভাইডার যুক্ত করুন এবং একটি প্রকল্প (`~/workspace`) যোগ করুন।
-- **সীমাবদ্ধতা**: PTY টার্মিনাল, LSP/ফরম্যাটার ও লোকাল MCP প্রসেস নেই; সার্চ `rg` ব্যবহার করে।
-- **লাইসেন্স**: MIT, মূল প্রকল্পের মতোই।
+| পাথ | বিষয়বস্তু |
+| --- | --- |
+| [`packages/android`](packages/android) | Android হোস্ট: Gradle প্রকল্প, WebView Activity, এমবেডেড সার্ভার, মোবাইল UI অ্যাডাপ্টেশন |
+| [`script/android`](script/android) | পুনরুৎপাদনযোগ্য বিল্ড: [`build-apk.sh`](script/android/build-apk.sh) এবং সার্ভার, ripgrep, git রানটাইম ও অনুবাদের স্ক্রিপ্ট |
+| [`docs/android`](docs/android) | কারিগরি ডকুমেন্ট: [বিল্ড](docs/android/BUILD.md), [এক্সিকিউশন পলিসি](docs/android/EXECUTION_POLICY.md), [নেটিভ নির্ভরতা](docs/android/NATIVE_DEPENDENCIES.md), [upstream প্যাচ](docs/android/UPSTREAM_PATCHES.md) |
+
+শুধু পাঁচটি upstream ফাইল পরিবর্তন করা হয়েছে (Android বিল্ড টার্গেট ও রানটাইম সামঞ্জস্য); প্রতিটির কারণ [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md)-এ লেখা আছে।
+
+কীভাবে কাজ করে: Activity এমবেডেড সার্ভার চালু করে (`libopencode.so serve --hostname=127.0.0.1`) এবং WebView-এ `http://127.0.0.1:4096/` লোড করে। টুলগুলো অ্যাপের nativeLibraryDir থেকে চলে: `/system/bin/sh`, বান্ডল করা `git`, `rg` এবং `bun`/`node` নামে Bun রানটাইম।
+
+- **ডাউনলোড**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **বিল্ড**: `./script/android/build-apk.sh` — দেখুন [`docs/android/BUILD.md`](docs/android/BUILD.md)
+- **প্রথম চালু**: ফাইল অ্যাক্সেস দিন (সেশন `/sdcard/OpenCode`-এ থাকে এবং পুনঃইনস্টলেও টিকে থাকে), তারপর সেটিংস → প্রোভাইডার → একটি প্রোভাইডার যুক্ত করুন এবং একটি প্রকল্প (`~/workspace`) যোগ করুন
+- **কাজ করে**: সার্ভার ও ওয়েব UI, সেশন, diff ও সিনট্যাক্স হাইলাইটসহ git (Changes), প্রকল্প ফাইল ব্রাউজার (Files), কনটেক্সট ব্যবহার প্যানেল (Usage), কমান্ড ও JS/TS চালানো
+- **সীমাবদ্ধতা**: PTY টার্মিনাল, LSP/ফরম্যাটার ও লোকাল MCP প্রসেস নেই; নেটিভ file watcher নেই (সার্চ `rg` ব্যবহার করে)
+- **লাইসেন্স**: MIT, মূল প্রকল্পের মতোই
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ OpenCode ডেস্কটপ অ্যাপ্লিকেশন হিসে
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm`, or `.AppImage`     |
+
+### মোবাইল অ্যাপ (BETA)
+
+OpenCode এই ফর্ক থেকে বিল্ড করা নেটিভ APK হিসেবে Android-এও চলে। অ্যাপে আসল সার্ভার ও একই ওয়েব UI আছে; সেশন, প্রোভাইডার কী এবং প্রকল্প `/sdcard/OpenCode`-এ থাকে এবং পুনঃইনস্টলেও টিকে থাকে।
+
+| প্ল্যাটফর্ম | ডাউনলোড | নোট |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — প্রথম চালুতে ফাইল অ্যাক্সেস দিন |
+| সোর্স থেকে বিল্ড | `./script/android/build-apk.sh` | দেখুন [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
 # macOS (Homebrew)

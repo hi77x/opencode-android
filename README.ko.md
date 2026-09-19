@@ -44,16 +44,26 @@
 
 ## Android용 opencode
 
-이 포크는 완전한 Android 빌드를 제공합니다. 실제 서버, 에이전트, 세션, 원본 웹 UI가 휴대폰에서 로컬로 실행됩니다. UI는 수정하지 않은 `packages/app` 번들이며 WebView의 loopback을 통해 제공됩니다. PC, Termux, 원격 서버가 필요 없습니다.
+이 포크는 기존 opencode를 Android에서 네이티브로 실행합니다. 휴대폰에서 실제 서버, 에이전트, 세션, 그리고 **수정하지 않은** `packages/app` 웹 UI(WebView의 loopback 경유)가 동작합니다. PC, Termux, 원격 서버가 필요 없고 프로토콜 변경도 없습니다.
 
-APK에는 opencode 서버(Android용 Bun 1.4.2 빌드), diff와 구문 강조가 있는 git, 프로젝트 파일 브라우저, 컨텍스트 사용량 패널, 내장 Bun 런타임(`bun`/`node`)을 통한 JS/TS 실행, 그리고 ripgrep이 포함됩니다.
+우리가 upstream에 추가한 것 (나머지는 모두 upstream opencode입니다):
 
-- **다운로드**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
-- **설치**: `adb install -r app-release.apk`
-- **빌드**: `./script/android/build-apk.sh`
-- **첫 실행**: 설정 → 공급자에서 공급자를 연결하고 프로젝트(`~/workspace`)를 추가하세요.
-- **제한 사항**: PTY 터미널, LSP/포매터, 로컬 MCP 프로세스는 없습니다. 검색은 `rg`를 사용합니다.
-- **라이선스**: 원본과 동일한 MIT.
+| 경로 | 내용 |
+| --- | --- |
+| [`packages/android`](packages/android) | Android 호스트: Gradle 프로젝트, WebView Activity, 내장 서버, 모바일 UI 조정 |
+| [`script/android`](script/android) | 재현 가능한 빌드: [`build-apk.sh`](script/android/build-apk.sh)와 서버, ripgrep, git 런타임, 번역 스크립트 |
+| [`docs/android`](docs/android) | 기술 문서: [빌드](docs/android/BUILD.md), [실행 정책](docs/android/EXECUTION_POLICY.md), [네이티브 의존성](docs/android/NATIVE_DEPENDENCIES.md), [upstream 패치](docs/android/UPSTREAM_PATCHES.md) |
+
+수정하는 upstream 파일은 다섯 개뿐이며(Android 빌드 타깃과 런타임 호환성), 각 변경의 이유는 [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md)에 기록되어 있습니다.
+
+동작 방식: Activity가 내장 서버를 시작하고(`libopencode.so serve --hostname=127.0.0.1`) WebView에서 `http://127.0.0.1:4096/`을 로드합니다. 도구는 앱의 nativeLibraryDir에서 실행됩니다: `/system/bin/sh`, 내장 `git`, `rg`, 그리고 `bun`/`node`로 노출되는 Bun 런타임.
+
+- **다운로드**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
+- **빌드**: `./script/android/build-apk.sh` — [`docs/android/BUILD.md`](docs/android/BUILD.md) 참고
+- **첫 실행**: 파일 접근을 허용하세요(세션은 `/sdcard/OpenCode`에 저장되어 재설치 후에도 유지됩니다). 그런 다음 설정 → 공급자에서 공급자를 연결하고 프로젝트(`~/workspace`)를 추가하세요
+- **동작**: 서버와 웹 UI, 세션, diff와 구문 강조가 있는 git(Changes), 프로젝트 파일 브라우저(Files), 컨텍스트 사용량 패널(Usage), 명령 및 JS/TS 실행
+- **제한 사항**: PTY 터미널, LSP/포매터, 로컬 MCP 프로세스는 없습니다. 네이티브 file watcher는 사용할 수 없습니다(검색은 `rg` 사용)
+- **라이선스**: 원본과 동일한 MIT
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
@@ -90,6 +100,15 @@ OpenCode 는 데스크톱 앱으로도 제공됩니다. [releases page](https://
 | macOS (Intel)         | `opencode-desktop-mac-x64.dmg`     |
 | Windows               | `opencode-desktop-windows-x64.exe` |
 | Linux                 | `.deb`, `.rpm`, 또는 AppImage      |
+
+### 모바일 앱 (BETA)
+
+OpenCode는 이 포크에서 빌드한 네이티브 APK로 Android에서도 실행됩니다. 실제 서버와 동일한 웹 UI를 포함하며, 세션, 공급자 키, 프로젝트는 `/sdcard/OpenCode`에 저장되어 재설치 후에도 유지됩니다.
+
+| 플랫폼 | 다운로드 | 비고 |
+| --- | --- | --- |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — 첫 실행 시 파일 접근을 허용하세요 |
+| 소스에서 빌드 | `./script/android/build-apk.sh` | [`packages/android/README.md`](packages/android/README.md) 참고 |
 
 ```bash
 # macOS (Homebrew)
