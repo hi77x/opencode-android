@@ -44,6 +44,9 @@
 
 ## opencode til Android
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 Dette fork kører det eksisterende opencode nativt på Android: telefonen kører den rigtige server, agenten, sessionerne og den **uændrede** `packages/app`-webflade (via loopback i en WebView). Ingen PC, ingen Termux, ingen ekstern server og ingen protokolændringer.
 
 Det vi selv har tilføjet (alt andet er upstream opencode):
@@ -56,11 +59,11 @@ Det vi selv har tilføjet (alt andet er upstream opencode):
 
 Kun fem upstream-filer ændres (Android-buildtarget og runtime-kompatibilitet); hver ændring er begrundet i [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
 
-Sådan virker det: activity'en starter den indlejrede server (`libopencode.so serve --hostname=127.0.0.1`) og indlæser `http://127.0.0.1:4096/` i en WebView. Værktøjer kører fra appens native biblioteksmappe: `/system/bin/sh`, medfølgende `git`, `rg` og en Bun-runtime som `bun`/`node`.
+Sådan virker det: activity'en starter den indlejrede server (`libopencode.so serve --hostname=127.0.0.1`) og indlæser `http://127.0.0.1:<port>/` i en WebView. Værktøjer kører fra appens native biblioteksmappe: `/system/bin/sh`, medfølgende `git`, `rg` og en Bun-runtime som `bun`/`node`.
 
 - **Download**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **Build**: `./script/android/build-apk.sh` — se [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **Første start**: giv filadgang (sessioner ligger i `/sdcard/OpenCode` og overlever geninstallation), gå derefter til Indstillinger → Udbyder → forbind en udbyder og tilføj et projekt (`~/workspace`)
+- **Første start**: giv filadgang (sessioner ligger i `/sdcard/OpenCode/home` og overlever geninstallation), gå derefter til Indstillinger → Udbyder → forbind en udbyder og tilføj et projekt (`~/workspace`)
 - **Virker**: server og webflade, sessioner, git med diffs og syntaksfremhævning (Changes), projektfilbrowser (Files), kontekstforbrugspanel (Usage), kommando- og JS/TS-kørsel
 - **Begrænsninger**: ingen PTY-terminal, LSP/formattere eller lokale MCP-processer; den native file watcher mangler (søgning bruger `rg`)
 - **Licens**: MIT, som originalen
@@ -103,7 +106,7 @@ OpenCode findes også som desktop-app. Download direkte fra [releases-siden](htt
 
 ### Mobilapp (BETA)
 
-OpenCode kører også på Android som en native APK bygget fra dette fork. Appen indeholder den rigtige server og samme webflade; sessioner, udbydernøgler og projekter ligger i `/sdcard/OpenCode` og overlever geninstallation.
+OpenCode kører også på Android som en native APK bygget fra dette fork. Appen indeholder den rigtige server og samme webflade; sessioner, udbydernøgler og projekter ligger i `/sdcard/OpenCode/home` og overlever geninstallation.
 
 | Platform | Download | Bemærkninger |
 | --- | --- | --- |
