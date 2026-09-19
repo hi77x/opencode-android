@@ -39,6 +39,22 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
+
+---
+
+## opencode para Android
+
+Este fork incluye una compilación completa de opencode para Android: el servidor real, el agente, las sesiones y la interfaz web original se ejecutan localmente en el teléfono. La interfaz es el bundle `packages/app` sin cambios, servido por loopback dentro de un WebView. Sin PC, sin Termux, sin servidor remoto.
+
+En el APK: el servidor opencode (compilación de Bun 1.4.2 para Android), git con diffs y resaltado de sintaxis, un explorador de archivos del proyecto, el panel de uso del contexto y ejecución de JS/TS mediante el runtime Bun incluido (`bun`/`node`), además de ripgrep.
+
+- **Descarga**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
+- **Instalación**: `adb install -r app-release.apk`
+- **Compilación**: `./script/android/build-apk.sh`
+- **Primer inicio**: conecta un proveedor en Ajustes → Proveedores y añade un proyecto (`~/workspace`).
+- **Limitaciones**: sin terminal PTY, sin LSP/formateadores, sin procesos MCP locales; la búsqueda usa `rg`.
+- **Licencia**: MIT, igual que el original.
+
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
 ---

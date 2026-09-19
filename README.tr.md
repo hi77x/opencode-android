@@ -39,6 +39,22 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
+
+---
+
+## Android için opencode
+
+Bu çatal, opencode'un eksiksiz bir Android derlemesini içerir: gerçek sunucu, ajan, oturumlar ve özgün web arayüzü telefonda yerel olarak çalışır. Arayüz, değiştirilmemiş `packages/app` paketidir ve WebView içinde loopback üzerinden sunulur. PC yok, Termux yok, uzak sunucu yok.
+
+APK içinde: opencode sunucusu (Android için Bun 1.4.2 derlemesi), diff ve sözdizimi vurgulamalı git, proje dosya tarayıcısı, bağlam kullanım paneli ve gömülü Bun çalışma zamanıyla (`bun`/`node`) JS/TS yürütme; ayrıca ripgrep.
+
+- **İndirme**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
+- **Kurulum**: `adb install -r app-release.apk`
+- **Derleme**: `./script/android/build-apk.sh`
+- **İlk açılış**: Ayarlar → Sağlayıcılar bölümünden bir sağlayıcı bağlayın ve bir proje ekleyin (`~/workspace`).
+- **Sınırlamalar**: PTY terminali, LSP/biçimlendiriciler ve yerel MCP süreçleri yok; arama `rg` kullanır.
+- **Lisans**: MIT, orijinaliyle aynı.
+
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
 ---

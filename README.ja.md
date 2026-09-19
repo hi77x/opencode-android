@@ -39,6 +39,22 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
+
+---
+
+## Android 版 opencode
+
+このフォークには完全な Android ビルドが含まれます。本物のサーバー、エージェント、セッション、オリジナルの Web UI がスマートフォン上でローカルに動作します。UI は変更していない `packages/app` バンドルで、WebView 内の loopback 経由で配信されます。PC も Termux もリモートサーバーも不要です。
+
+APK には、opencode サーバー（Android 向け Bun 1.4.2 ビルド）、差分とシンタックスハイライト付きの git、プロジェクトのファイルブラウザ、コンテキスト使用量パネル、同梱の Bun ランタイム（`bun`/`node`）による JS/TS 実行、そして ripgrep が含まれます。
+
+- **ダウンロード**: [releases](https://github.com/hi77x/opencode-android/releases)（`app-release.apk`）
+- **インストール**: `adb install -r app-release.apk`
+- **ビルド**: `./script/android/build-apk.sh`
+- **初回起動**: 設定 → プロバイダー でプロバイダーを接続し、プロジェクト（`~/workspace`）を追加します。
+- **制限**: PTY ターミナル、LSP／フォーマッター、ローカル MCP プロセスは未対応。検索は `rg` を使用します。
+- **ライセンス**: MIT（オリジナルと同じ）。
+
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
 ---

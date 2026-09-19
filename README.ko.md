@@ -39,6 +39,22 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
+
+---
+
+## Android용 opencode
+
+이 포크는 완전한 Android 빌드를 제공합니다. 실제 서버, 에이전트, 세션, 원본 웹 UI가 휴대폰에서 로컬로 실행됩니다. UI는 수정하지 않은 `packages/app` 번들이며 WebView의 loopback을 통해 제공됩니다. PC, Termux, 원격 서버가 필요 없습니다.
+
+APK에는 opencode 서버(Android용 Bun 1.4.2 빌드), diff와 구문 강조가 있는 git, 프로젝트 파일 브라우저, 컨텍스트 사용량 패널, 내장 Bun 런타임(`bun`/`node`)을 통한 JS/TS 실행, 그리고 ripgrep이 포함됩니다.
+
+- **다운로드**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
+- **설치**: `adb install -r app-release.apk`
+- **빌드**: `./script/android/build-apk.sh`
+- **첫 실행**: 설정 → 공급자에서 공급자를 연결하고 프로젝트(`~/workspace`)를 추가하세요.
+- **제한 사항**: PTY 터미널, LSP/포매터, 로컬 MCP 프로세스는 없습니다. 검색은 `rg`를 사용합니다.
+- **라이선스**: 원본과 동일한 MIT.
+
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
 ---

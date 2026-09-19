@@ -39,6 +39,22 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
+
+---
+
+## opencode Android 版
+
+本分支提供完整的 opencode Android 构建：真实的服务器、Agent、会话以及原始 Web 界面都在手机上本地运行。界面是未经修改的 `packages/app` 包，通过 loopback 在 WebView 中打开。无需电脑、Termux 或远程服务器。
+
+APK 内含：opencode 服务器（面向 Android 的 Bun 1.4.2 构建）、带差异与语法高亮的 git、项目文件浏览器、上下文用量面板，以及通过内置 Bun 运行时（`bun`/`node`）执行 JS/TS，另含 ripgrep。
+
+- **下载**：[releases](https://github.com/hi77x/opencode-android/releases)（`app-release.apk`）
+- **安装**：`adb install -r app-release.apk`
+- **构建**：`./script/android/build-apk.sh`
+- **首次启动**：在 设置 → 提供商 中连接提供商，并添加项目（`~/workspace`）。
+- **限制**：没有 PTY 终端、LSP/格式化工具和本地 MCP 进程；搜索使用 `rg`。
+- **许可证**：MIT，与原项目相同。
+
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
 ---

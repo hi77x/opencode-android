@@ -39,6 +39,22 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
+
+---
+
+## opencode สำหรับ Android
+
+ฟอร์กนี้มาพร้อมบิลด์ Android แบบครบชุดของ opencode: เซิร์ฟเวอร์จริง เอเจนต์ เซสชัน และเว็บอินเทอร์เฟซต้นฉบับทำงานบนโทรศัพท์โดยตรง UI คือบันเดิล `packages/app` ที่ไม่ได้แก้ไข เปิดผ่าน loopback ใน WebView ไม่ต้องใช้พีซี ไม่ต้องใช้ Termux และไม่ต้องมีเซิร์ฟเวอร์ระยะไกล
+
+ภายใน APK: เซิร์ฟเวอร์ opencode (บิลด์ Bun 1.4.2 สำหรับ Android), git พร้อม diff และการไฮไลต์ไวยากรณ์, ตัวเรียกดูไฟล์โปรเจกต์, แผงการใช้บริบท และการรัน JS/TS ผ่านรันไทม์ Bun ที่มาพร้อม (`bun`/`node`) รวมถึง ripgrep
+
+- **ดาวน์โหลด**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
+- **ติดตั้ง**: `adb install -r app-release.apk`
+- **บิลด์**: `./script/android/build-apk.sh`
+- **เปิดครั้งแรก**: เชื่อมต่อผู้ให้บริการใน การตั้งค่า → ผู้ให้บริการ และเพิ่มโปรเจกต์ (`~/workspace`)
+- **ข้อจำกัด**: ไม่มีเทอร์มินัล PTY, LSP/ตัวจัดรูปแบบ และโปรเซส MCP ภายในเครื่อง; การค้นหาใช้ `rg`
+- **สัญญาอนุญาต**: MIT เช่นเดียวกับต้นฉบับ
+
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
 ---

@@ -39,77 +39,21 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
----
-
-## opencode для Android
-
-Это форк официального [opencode](https://github.com/anomalyco/opencode) с полноценной сборкой под Android: приложение запускает **настоящий opencode локально на телефоне** — со встроенным сервером, сессиями, агентом, инструментами и тем же самым веб-интерфейсом, что и на компьютере.
-
-Никакого ПК, VPS, Termux и удалённых серверов: всё работает на устройстве.
-
-### Что внутри
-
-- Тот же UI `packages/app` (не изменялся) открывается в WebView с локального сервера.
-- Настоящий opencode-сервер собран как `libopencode.so` (Bun 1.4.2, target `bun-linux-arm64-android`).
-- Git прямо в приложении: вкладка **Changes** показывает реальные диффы с подсветкой синтаксиса, работает создание репозитория.
-- Вкладка **Files** — браузер файлов проекта.
-- Вкладка **Usage** и кружок контекста — расход токенов и разбивка контекста, как в desktop-версии.
-- Выполнение команд и JS/TS: shell (`/system/bin/sh`), `git`, `rg`, `bun`/`node` (рантайм Bun для Android).
-- Всё исполняемое лежит внутри APK (jniLibs) и не докачивается — это требование Android 10+ (W^X).
-
-### Скачать
-
-Готовый APK — в [releases](https://github.com/hi77x/opencode-android/releases). Подпись: release-ключ проекта.
-
-```
-adb install -r app-release.apk
-```
-
-### Первый запуск
-
-1. Откройте приложение — сервер поднимется сам и откроется UI.
-2. **Настройки → Провайдеры** — подключите провайдера и введите API-ключ (OpenAI-совместимый endpoint тоже подойдёт).
-3. Создайте проект (кнопка «Добавить проект» → папка `~/workspace` или любая папка внутри хранилища приложения) и начинайте сессию.
-
-### Сборка из исходников
-
-```sh
-./script/android/build-apk.sh
-# результат: packages/android/app/build/outputs/apk/debug/app-debug.apk
-./packages/android/gradlew -p packages/android :app:assembleRelease
-```
-
-Требования: Bun ≥ 1.4.2, Python 3, curl, JDK 17/21, Android SDK 35. Для сборки `rg` нужен NDK и Rust (`script/android/build-ripgrep.sh`). Релизная подпись читается из `packages/android/local.properties` (`RELEASE_STORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`) и `packages/android/keystore/`; без них release собирается debug-ключом.
-
-### Ограничения
-
-- Терминал (PTY) пока недоступен: у `bun-pty` нет сборки под Android.
-- LSP и форматтеры отключены (нет соответствующих бинарников на устройстве).
-- Локальные MCP-процессы и fuzzy-поиск `fff` недоступны; поиск работает через `rg`.
-- Нативный файловый watcher без бинаря — обновления файлов подхватываются операциями агента, а не мгновенным слежением.
-
-### Лицензия
-
-MIT — та же, что и у оригинала (см. [LICENSE](LICENSE)). Третьи стороны, попадающие в APK при сборке (git — GPL-2.0, ripgrep — MIT/Unlicense, Bun — MIT), загружаются скриптами из официальных источников.
-
-<details>
-<summary>English</summary>
-
-### opencode for Android (English)
-
-A fork of [opencode](https://github.com/anomalyco/opencode) with a complete Android build. The app runs the real opencode locally on the phone: the same server, sessions, agent, tools and the unmodified `packages/app` web UI (served from loopback inside a WebView).
-
-Includes git with syntax-highlighted diffs, a project file browser, the context-usage panel, and JS/TS execution via a bundled Bun runtime. No PC, no Termux, no remote server.
-
-Download the APK from [releases](https://github.com/hi77x/opencode-android/releases). Build with `./script/android/build-apk.sh`.
-
-Known limitations: no PTY terminal, no LSP/formatters, no local MCP processes; search uses `rg`.
-
-MIT license, same as upstream.
-
-</details>
 
 ---
+
+## opencode for Android
+
+This fork ships a complete Android build of opencode: the real server, agent, sessions and the original web UI run locally on the phone. The UI is the unchanged `packages/app` bundle served over loopback inside a WebView — no PC, no Termux, no remote server.
+
+Inside the APK: the opencode server (Bun 1.4.2 Android build), git with syntax-highlighted diffs, a project file browser, the context-usage panel, and JS/TS execution through a bundled Bun runtime (`bun`/`node`), plus ripgrep.
+
+- **Download**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
+- **Install**: `adb install -r app-release.apk`
+- **Build**: `./script/android/build-apk.sh`
+- **First launch**: connect a provider in Settings → Providers and add a project (`~/workspace`).
+- **Limitations**: no PTY terminal, no LSP/formatters, no local MCP processes; search uses `rg`.
+- **License**: MIT, same as upstream.
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 

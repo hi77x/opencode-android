@@ -39,6 +39,22 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
+
+---
+
+## opencode لنظام Android
+
+توفّر هذه النسخة بناءً كاملاً لنظام Android: الخادم الحقيقي والوكيل والجلسات وواجهة الويب الأصلية تعمل محلياً على الهاتف. الواجهة هي حزمة `packages/app` دون تغيير، تُقدَّم عبر loopback داخل WebView. بلا حاسوب، وبلا Termux، وبلا خادم بعيد.
+
+داخل ملف APK: خادم opencode (بناء Bun 1.4.2 لنظام Android)، وgit مع الفروقات وتلوين الصياغة، ومتصفح ملفات المشروع، ولوحة استخدام السياق، وتنفيذ JS/TS عبر Bun المضمّن (`bun`/`node`)، إضافة إلى ripgrep.
+
+- **التنزيل**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`)
+- **التثبيت**: `adb install -r app-release.apk`
+- **البناء**: `./script/android/build-apk.sh`
+- **أول تشغيل**: اربط مزوّداً من الإعدادات ← المزوّدون وأضف مشروعاً (`~/workspace`).
+- **القيود**: لا طرفية PTY ولا LSP/منسّقات ولا عمليات MCP محلية؛ البحث يستخدم `rg`.
+- **الترخيص**: MIT كما الأصل.
+
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
 
 ---
