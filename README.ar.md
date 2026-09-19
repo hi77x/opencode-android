@@ -44,6 +44,9 @@
 
 ## opencode لنظام Android
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 يشغّل هذا التفرّع نسخة opencode الحالية أصلياً على Android: الهاتف يشغّل الخادم الحقيقي والوكيل والجلسات وواجهة `packages/app` **دون تغيير** (عبر loopback داخل WebView). بلا حاسوب، وبلا Termux، وبلا خادم بعيد، ودون أي تغيير في البروتوكول.
 
 ما أضفناه فوق upstream (وكل ما تبقى هو opencode الأصلي):
@@ -56,11 +59,11 @@
 
 تم تعديل خمسة ملفات upstream فقط (هدف بناء Android وتوافق زمن التشغيل)، وكل تعديل موثّق مع سببه في [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
 
-كيف يعمل: يبدأ النشاط الخادم المضمّن (`libopencode.so serve --hostname=127.0.0.1`) ويحمّل `http://127.0.0.1:4096/` في WebView. تعمل الأدوات من مجلد المكتبات الأصلية للتطبيق: `/system/bin/sh` و`git` و`rg` المضمّنة وزمن تشغيل Bun المكشوف باسم `bun`/`node`.
+كيف يعمل: يبدأ النشاط الخادم المضمّن (`libopencode.so serve --hostname=127.0.0.1`) ويحمّل `http://127.0.0.1:<port>/` في WebView. تعمل الأدوات من مجلد المكتبات الأصلية للتطبيق: `/system/bin/sh` و`git` و`rg` المضمّنة وزمن تشغيل Bun المكشوف باسم `bun`/`node`.
 
 - **التنزيل**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`، arm64، Android 8.0+)
 - **البناء**: `./script/android/build-apk.sh` — راجع [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **أول تشغيل**: امنح الوصول إلى الملفات (تُحفظ الجلسات في `/sdcard/OpenCode` وتبقى بعد إعادة التثبيت)، ثم الإعدادات ← المزوّدون ← اربط مزوّداً وأضف مشروعاً (`~/workspace`)
+- **أول تشغيل**: امنح الوصول إلى الملفات (تُحفظ الجلسات في `/sdcard/OpenCode/home` وتبقى بعد إعادة التثبيت)، ثم الإعدادات ← المزوّدون ← اربط مزوّداً وأضف مشروعاً (`~/workspace`)
 - **يعمل**: الخادم وواجهة الويب، الجلسات، git مع الفروقات وتلوين الصياغة (Changes)، متصفح ملفات المشروع (Files)، لوحة استخدام السياق (Usage)، تنفيذ الأوامر وJS/TS
 - **القيود**: لا طرفية PTY ولا LSP/منسّقات ولا عمليات MCP محلية؛ مراقب الملفات الأصلي غير متاح (البحث يستخدم `rg`)
 - **الترخيص**: MIT كما الأصل
@@ -103,7 +106,7 @@ nix run nixpkgs#opencode           # او github:anomalyco/opencode لاحدث �
 
 ### تطبيق الجوال (BETA)
 
-يعمل OpenCode أيضاً على Android كملف APK أصلي مبني من هذا التفرّع. يحتوي التطبيق على الخادم الحقيقي ونفس واجهة الويب؛ تُحفظ الجلسات ومفاتيح المزوّدين والمشاريع في `/sdcard/OpenCode` وتبقى بعد إعادة التثبيت.
+يعمل OpenCode أيضاً على Android كملف APK أصلي مبني من هذا التفرّع. يحتوي التطبيق على الخادم الحقيقي ونفس واجهة الويب؛ تُحفظ الجلسات ومفاتيح المزوّدين والمشاريع في `/sdcard/OpenCode/home` وتبقى بعد إعادة التثبيت.
 
 | المنصة | التنزيل | ملاحظات |
 | --- | --- | --- |
