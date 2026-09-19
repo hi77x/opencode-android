@@ -44,6 +44,9 @@
 
 ## opencode สำหรับ Android
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 ฟอร์กนี้รัน opencode ที่มีอยู่แบบเนทีฟบน Android: โทรศัพท์รันเซิร์ฟเวอร์จริง เอเจนต์ เซสชัน และอินเทอร์เฟซ `packages/app` ที่**ไม่ได้แก้ไข** (ผ่าน loopback ใน WebView) ไม่ต้องใช้พีซี, Termux, เซิร์ฟเวอร์ระยะไกล และไม่มีการเปลี่ยนโปรโตคอล
 
 สิ่งที่เราเพิ่มจาก upstream (ที่เหลือคือ opencode upstream ทั้งหมด):
@@ -56,11 +59,11 @@
 
 มีเพียงห้าไฟล์ upstream ที่ถูกแก้ไข (เป้าหมายบิลด์ Android และความเข้ากันได้ของรันไทม์) แต่ละอย่างมีเหตุผลใน [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md)
 
-วิธีการทำงาน: Activity เริ่มเซิร์ฟเวอร์ฝังตัว (`libopencode.so serve --hostname=127.0.0.1`) และโหลด `http://127.0.0.1:4096/` ใน WebView เครื่องมือรันจาก nativeLibraryDir ของแอป: `/system/bin/sh`, `git`, `rg` ที่แนบมา และรันไทม์ Bun ที่เปิดเป็น `bun`/`node`
+วิธีการทำงาน: Activity เริ่มเซิร์ฟเวอร์ฝังตัว (`libopencode.so serve --hostname=127.0.0.1`) และโหลด `http://127.0.0.1:<port>/` ใน WebView เครื่องมือรันจาก nativeLibraryDir ของแอป: `/system/bin/sh`, `git`, `rg` ที่แนบมา และรันไทม์ Bun ที่เปิดเป็น `bun`/`node`
 
 - **ดาวน์โหลด**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **บิลด์**: `./script/android/build-apk.sh` — ดู [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **เปิดครั้งแรก**: อนุญาตการเข้าถึงไฟล์ (เซสชันเก็บใน `/sdcard/OpenCode` และอยู่รอดหลังติดตั้งใหม่) จากนั้น การตั้งค่า → ผู้ให้บริการ → เชื่อมต่อผู้ให้บริการและเพิ่มโปรเจกต์ (`~/workspace`)
+- **เปิดครั้งแรก**: อนุญาตการเข้าถึงไฟล์ (เซสชันเก็บใน `/sdcard/OpenCode/home` และอยู่รอดหลังติดตั้งใหม่) จากนั้น การตั้งค่า → ผู้ให้บริการ → เชื่อมต่อผู้ให้บริการและเพิ่มโปรเจกต์ (`~/workspace`)
 - **ทำงานได้**: เซิร์ฟเวอร์และเว็บ UI, เซสชัน, git พร้อม diff และไฮไลต์ไวยากรณ์ (Changes), ตัวเรียกดูไฟล์โปรเจกต์ (Files), แผงการใช้บริบท (Usage), การรันคำสั่งและ JS/TS
 - **ข้อจำกัด**: ไม่มีเทอร์มินัล PTY, LSP/ตัวจัดรูปแบบ และโปรเซส MCP ภายในเครื่อง; file watcher แบบเนทีฟใช้ไม่ได้ (ค้นหาด้วย `rg`)
 - **สัญญาอนุญาต**: MIT เช่นเดียวกับต้นฉบับ
@@ -103,7 +106,7 @@ OpenCode มีให้ใช้งานเป็นแอปพลิเค�
 
 ### แอปมือถือ (BETA)
 
-OpenCode ทำงานบน Android เป็น APK เนทีฟที่บิลด์จากฟอร์กนี้ แอปมีเซิร์ฟเวอร์จริงและเว็บ UI เดียวกัน; เซสชัน คีย์ผู้ให้บริการ และโปรเจกต์เก็บใน `/sdcard/OpenCode` และอยู่รอดหลังติดตั้งใหม่
+OpenCode ทำงานบน Android เป็น APK เนทีฟที่บิลด์จากฟอร์กนี้ แอปมีเซิร์ฟเวอร์จริงและเว็บ UI เดียวกัน; เซสชัน คีย์ผู้ให้บริการ และโปรเจกต์เก็บใน `/sdcard/OpenCode/home` และอยู่รอดหลังติดตั้งใหม่
 
 | แพลตฟอร์ม | ดาวน์โหลด | หมายเหตุ |
 | --- | --- | --- |
