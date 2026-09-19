@@ -44,7 +44,7 @@
 
 ## opencode для Android
 
-Этот форк запускает существующий opencode нативно на Android: на телефоне работают настоящий сервер, агент, сессии и **неизменённый** веб-интерфейс `packages/app` (через loopback в WebView). Без ПК, Termux, удалённого сервера и изменений протокола.
+Этот форк запускает существующий opencode нативно на Android: на телефоне работают настоящий сервер, агент, сессии и веб-интерфейс `packages/app` через loopback в WebView. Android-хост добавляет мобильные стили, просмотр файлов и панель Usage, не меняя исходники `packages/app`. ПК, Termux, root и удалённый сервер OpenCode не нужны; для облачных моделей нужны интернет и учётные данные провайдера.
 
 Что добавили мы (всё остальное — upstream opencode):
 
@@ -56,7 +56,7 @@
 
 Изменены всего пять файлов upstream (цель сборки под Android и совместимость рантайма); каждый описан с причиной в [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
 
-Как это работает: активити запускает встроенный сервер (`libopencode.so serve --hostname=127.0.0.1`) и загружает `http://127.0.0.1:4096/` в WebView. Инструменты запускаются из nativeLibraryDir приложения: `/system/bin/sh`, встроенные `git`, `rg` и рантайм Bun под именами `bun`/`node`.
+Как это работает: активити запускает встроенный сервер (`libopencode.so serve --hostname=127.0.0.1`) и загружает `http://127.0.0.1:<port>/` в WebView (порт выбирается при запуске). Инструменты запускаются из nativeLibraryDir приложения: `/system/bin/sh`, встроенные `git`, `rg` и рантайм Bun под именами `bun`/`node`.
 
 - **Скачать**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **Сборка**: `./script/android/build-apk.sh` — см. [`docs/android/BUILD.md`](docs/android/BUILD.md)
@@ -66,6 +66,9 @@
 - **Лицензия**: MIT, как у оригинала
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+
+> [!IMPORTANT]
+> Тег релиза `v0.1.1` указывает на старый коммит upstream без Android-модуля. Исходники Android находятся в ветке `main`; для [сборки](docs/android/BUILD.md) используйте её. Точное соответствие опубликованного APK содержимому `main` не подтверждено.
 
 ---
 
@@ -103,11 +106,11 @@ OpenCode также доступен как десктопное приложе�
 
 ### Мобильное приложение (BETA)
 
-OpenCode также работает на Android: нативная APK собирается из этого форка. Приложение содержит настоящий сервер и тот же веб-интерфейс; сессии, ключи провайдеров и проекты хранятся в `/sdcard/OpenCode` и переживают переустановку.
+OpenCode также работает на Android: нативная APK собирается из этого форка. Приложение содержит настоящий сервер и тот же веб-интерфейс; при разрешённом доступе ко всем файлам данные сервера хранятся в `/sdcard/OpenCode/home` и сохраняются после удаления приложения. Без разрешения они удаляются при деинсталляции.
 
 | Платформа | Загрузка | Примечания |
 | --- | --- | --- |
-| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — при первом запуске разрешите доступ к файлам |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA — разрешите доступ ко всем файлам для сохранения данных |
 | Сборка из исходников | `./script/android/build-apk.sh` | см. [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
