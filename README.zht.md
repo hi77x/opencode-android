@@ -44,6 +44,9 @@
 
 ## opencode Android 版
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 此分支讓現有的 opencode 在 Android 上原生執行：手機本機執行真正的伺服器、Agent、工作階段，以及**未經修改**的 `packages/app` 網頁介面（透過 WebView 中的 loopback）。無需電腦、Termux、遠端伺服器，也不更動通訊協定。
 
 我們在上游之上新增的內容（其餘皆為上游 opencode）：
@@ -56,11 +59,11 @@
 
 僅修改五個上游檔案（Android 建置目標與執行環境相容性）；每個變更與原因都記錄在 [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md)。
 
-運作方式：Activity 啟動內嵌伺服器（`libopencode.so serve --hostname=127.0.0.1`），並在 WebView 載入 `http://127.0.0.1:4096/`。工具從應用程式的 nativeLibraryDir 執行：`/system/bin/sh`、內附 `git`、`rg`，以及以 `bun`/`node` 提供的 Bun 執行環境。
+運作方式：Activity 啟動內嵌伺服器（`libopencode.so serve --hostname=127.0.0.1`），並在 WebView 載入 `http://127.0.0.1:<port>/`。工具從應用程式的 nativeLibraryDir 執行：`/system/bin/sh`、內附 `git`、`rg`，以及以 `bun`/`node` 提供的 Bun 執行環境。
 
 - **下載**：[releases](https://github.com/hi77x/opencode-android/releases)（`app-release.apk`，arm64，Android 8.0+）
 - **建置**：`./script/android/build-apk.sh` — 參見 [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **首次啟動**：授予檔案存取權（工作階段儲存在 `/sdcard/OpenCode`，重新安裝後仍保留），接著在 設定 → 供應商 中連接供應商並新增專案（`~/workspace`）
+- **首次啟動**：授予檔案存取權（工作階段儲存在 `/sdcard/OpenCode/home`，重新安裝後仍保留），接著在 設定 → 供應商 中連接供應商並新增專案（`~/workspace`）
 - **可用**：伺服器與網頁介面、工作階段、含語法高亮差異的 git（Changes）、專案檔案瀏覽器（Files）、上下文用量面板（Usage）、指令與 JS/TS 執行
 - **限制**：沒有 PTY 終端、LSP/格式化工具與本機 MCP 程序；原生 file watcher 無法使用（搜尋使用 `rg`）
 - **授權**：MIT，與原專案相同
@@ -103,7 +106,7 @@ OpenCode 也提供桌面版應用程式。您可以直接從 [發佈頁面 (rele
 
 ### 行動應用（BETA）
 
-OpenCode 也能在 Android 上以本分支建置的原生 APK 執行。應用程式內含真正的伺服器與同一個網頁介面；工作階段、供應商金鑰與專案儲存在 `/sdcard/OpenCode`，重新安裝後仍保留。
+OpenCode 也能在 Android 上以本分支建置的原生 APK 執行。應用程式內含真正的伺服器與同一個網頁介面；工作階段、供應商金鑰與專案儲存在 `/sdcard/OpenCode/home`，重新安裝後仍保留。
 
 | 平台 | 下載 | 說明 |
 | --- | --- | --- |
