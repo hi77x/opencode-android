@@ -44,6 +44,9 @@
 
 ## opencode za Android
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 Ovaj fork pokreće postojeći opencode nativno na Androidu: telefon izvršava pravi server, agenta, sesije i **nepromijenjeni** `packages/app` web interfejs (preko loopback-a u WebView-u). Bez PC-a, bez Termux-a, bez udaljenog servera i bez promjena protokola.
 
 Šta smo mi dodali (sve ostalo je upstream opencode):
@@ -56,11 +59,11 @@ Ovaj fork pokreće postojeći opencode nativno na Androidu: telefon izvršava pr
 
 Mijenja se samo pet upstream datoteka (Android build cilj i kompatibilnost runtime-a); svaka je dokumentovana s razlogom u [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
 
-Kako radi: activity pokreće ugrađeni server (`libopencode.so serve --hostname=127.0.0.1`) i učitava `http://127.0.0.1:4096/` u WebView. Alati se izvršavaju iz nativeLibraryDir-a aplikacije: `/system/bin/sh`, ugrađeni `git`, `rg` i Bun runtime izložen kao `bun`/`node`.
+Kako radi: activity pokreće ugrađeni server (`libopencode.so serve --hostname=127.0.0.1`) i učitava `http://127.0.0.1:<port>/` u WebView. Alati se izvršavaju iz nativeLibraryDir-a aplikacije: `/system/bin/sh`, ugrađeni `git`, `rg` i Bun runtime izložen kao `bun`/`node`.
 
 - **Preuzmi**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **Build**: `./script/android/build-apk.sh` — vidi [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **Prvo pokretanje**: odobrite pristup datotekama (sesije su u `/sdcard/OpenCode` i preživljavaju reinstalaciju), zatim Postavke → Provajderi → povežite provajdera i dodajte projekat (`~/workspace`)
+- **Prvo pokretanje**: odobrite pristup datotekama (sesije su u `/sdcard/OpenCode/home` i preživljavaju reinstalaciju), zatim Postavke → Provajderi → povežite provajdera i dodajte projekat (`~/workspace`)
 - **Radi**: server i web UI, sesije, git s diffovima i isticanjem sintakse (Changes), preglednik datoteka projekta (Files), panel potrošnje konteksta (Usage), izvršavanje komandi i JS/TS
 - **Ograničenja**: nema PTY terminala, LSP/formatera ni lokalnih MCP procesa; nativni file watcher nije dostupan (pretraga koristi `rg`)
 - **Licenca**: MIT, kao i original
@@ -103,7 +106,7 @@ OpenCode je dostupan i kao desktop aplikacija. Preuzmi je direktno sa [stranice 
 
 ### Mobilna aplikacija (BETA)
 
-OpenCode radi i na Androidu kao nativni APK izgrađen iz ovog forka. Aplikacija sadrži pravi server i isti web UI; sesije, ključevi provajdera i projekti su u `/sdcard/OpenCode` i preživljavaju reinstalaciju.
+OpenCode radi i na Androidu kao nativni APK izgrađen iz ovog forka. Aplikacija sadrži pravi server i isti web UI; sesije, ključevi provajdera i projekti su u `/sdcard/OpenCode/home` i preživljavaju reinstalaciju.
 
 | Platforma | Preuzimanje | Napomene |
 | --- | --- | --- |
