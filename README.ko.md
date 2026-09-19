@@ -44,6 +44,9 @@
 
 ## Android용 opencode
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 이 포크는 기존 opencode를 Android에서 네이티브로 실행합니다. 휴대폰에서 실제 서버, 에이전트, 세션, 그리고 **수정하지 않은** `packages/app` 웹 UI(WebView의 loopback 경유)가 동작합니다. PC, Termux, 원격 서버가 필요 없고 프로토콜 변경도 없습니다.
 
 우리가 upstream에 추가한 것 (나머지는 모두 upstream opencode입니다):
@@ -56,11 +59,11 @@
 
 수정하는 upstream 파일은 다섯 개뿐이며(Android 빌드 타깃과 런타임 호환성), 각 변경의 이유는 [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md)에 기록되어 있습니다.
 
-동작 방식: Activity가 내장 서버를 시작하고(`libopencode.so serve --hostname=127.0.0.1`) WebView에서 `http://127.0.0.1:4096/`을 로드합니다. 도구는 앱의 nativeLibraryDir에서 실행됩니다: `/system/bin/sh`, 내장 `git`, `rg`, 그리고 `bun`/`node`로 노출되는 Bun 런타임.
+동작 방식: Activity가 내장 서버를 시작하고(`libopencode.so serve --hostname=127.0.0.1`) WebView에서 `http://127.0.0.1:<port>/`을 로드합니다. 도구는 앱의 nativeLibraryDir에서 실행됩니다: `/system/bin/sh`, 내장 `git`, `rg`, 그리고 `bun`/`node`로 노출되는 Bun 런타임.
 
 - **다운로드**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **빌드**: `./script/android/build-apk.sh` — [`docs/android/BUILD.md`](docs/android/BUILD.md) 참고
-- **첫 실행**: 파일 접근을 허용하세요(세션은 `/sdcard/OpenCode`에 저장되어 재설치 후에도 유지됩니다). 그런 다음 설정 → 공급자에서 공급자를 연결하고 프로젝트(`~/workspace`)를 추가하세요
+- **첫 실행**: 파일 접근을 허용하세요(세션은 `/sdcard/OpenCode/home`에 저장되어 재설치 후에도 유지됩니다). 그런 다음 설정 → 공급자에서 공급자를 연결하고 프로젝트(`~/workspace`)를 추가하세요
 - **동작**: 서버와 웹 UI, 세션, diff와 구문 강조가 있는 git(Changes), 프로젝트 파일 브라우저(Files), 컨텍스트 사용량 패널(Usage), 명령 및 JS/TS 실행
 - **제한 사항**: PTY 터미널, LSP/포매터, 로컬 MCP 프로세스는 없습니다. 네이티브 file watcher는 사용할 수 없습니다(검색은 `rg` 사용)
 - **라이선스**: 원본과 동일한 MIT
@@ -103,7 +106,7 @@ OpenCode 는 데스크톱 앱으로도 제공됩니다. [releases page](https://
 
 ### 모바일 앱 (BETA)
 
-OpenCode는 이 포크에서 빌드한 네이티브 APK로 Android에서도 실행됩니다. 실제 서버와 동일한 웹 UI를 포함하며, 세션, 공급자 키, 프로젝트는 `/sdcard/OpenCode`에 저장되어 재설치 후에도 유지됩니다.
+OpenCode는 이 포크에서 빌드한 네이티브 APK로 Android에서도 실행됩니다. 실제 서버와 동일한 웹 UI를 포함하며, 세션, 공급자 키, 프로젝트는 `/sdcard/OpenCode/home`에 저장되어 재설치 후에도 유지됩니다.
 
 | 플랫폼 | 다운로드 | 비고 |
 | --- | --- | --- |
