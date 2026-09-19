@@ -19,6 +19,7 @@ import pkg from "../package.json"
 const singleFlag = process.argv.includes("--single")
 const baselineFlag = process.argv.includes("--baseline")
 const skipInstall = process.argv.includes("--skip-install")
+const targetFlag = process.argv.find((arg) => arg.startsWith("--target="))?.slice("--target=".length)
 const sourcemapsFlag = process.argv.includes("--sourcemaps")
 const plugin = createSolidTransformPlugin()
 const skipEmbedWebUi = process.argv.includes("--skip-embed-web-ui")
@@ -53,12 +54,22 @@ const treeSitterWorker = await Bun.file(fileURLToPath(import.meta.resolve("@open
 const allTargets: {
   os: string
   arch: "arm64" | "x64"
-  abi?: "musl"
+  abi?: "musl" | "android"
   avx2?: false
 }[] = [
   {
     os: "linux",
     arch: "arm64",
+  },
+  {
+    os: "linux",
+    arch: "arm64",
+    abi: "android",
+  },
+  {
+    os: "linux",
+    arch: "x64",
+    abi: "android",
   },
   {
     os: "linux",
@@ -113,26 +124,36 @@ const allTargets: {
   },
 ]
 
-const targets = singleFlag
-  ? allTargets.filter((item) => {
-      if (item.os !== process.platform || item.arch !== process.arch) {
-        return false
-      }
+const targetName = (item: (typeof allTargets)[number]) =>
+  [item.os, item.arch, item.abi, item.avx2 === false ? "baseline" : undefined].filter(Boolean).join("-")
 
-      // When building for the current platform, prefer a single native binary by default.
-      // Baseline binaries require additional Bun artifacts and can be flaky to download.
-      if (item.avx2 === false) {
-        return baselineFlag
-      }
+const targets = targetFlag
+  ? allTargets.filter((item) => targetName(item) === targetFlag)
+  : singleFlag
+    ? allTargets.filter((item) => {
+        if (item.os !== process.platform || item.arch !== process.arch) {
+          return false
+        }
 
-      // also skip abi-specific builds for the same reason
-      if (item.abi !== undefined) {
-        return false
-      }
+        // When building for the current platform, prefer a single native binary by default.
+        // Baseline binaries require additional Bun artifacts and can be flaky to download.
+        if (item.avx2 === false) {
+          return baselineFlag
+        }
 
-      return true
-    })
-  : allTargets
+        // also skip abi-specific builds for the same reason
+        if (item.abi !== undefined) {
+          return false
+        }
+
+        return true
+      })
+    : allTargets
+
+if (targets.length === 0) {
+  console.error(`No build targets matched${targetFlag ? ` --target=${targetFlag}` : ""}`)
+  process.exit(1)
+}
 
 await $`rm -rf dist`
 
@@ -196,8 +217,10 @@ for (const item of targets) {
       OTUI_TREE_SITTER_WORKER_PATH: bunfsRoot + treeSitterWorkerPath,
       OPENCODE_WORKER_PATH: workerPath,
       OPENCODE_CHANNEL: `'${Script.channel}'`,
-      OPENCODE_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "",
-      ...(item.os === "linux" ? { "process.env.OPENTUI_LIBC": JSON.stringify(item.abi ?? "glibc") } : {}),
+      OPENCODE_LIBC: item.os === "linux" ? `'${item.abi === "android" ? "bionic" : (item.abi ?? "glibc")}'` : "",
+      ...(item.os === "linux" && item.abi !== "android"
+        ? { "process.env.OPENTUI_LIBC": JSON.stringify(item.abi ?? "glibc") }
+        : {}),
     },
   })
 
@@ -221,9 +244,9 @@ for (const item of targets) {
         name,
         version: Script.version,
         preferUnplugged: true,
-        os: [item.os],
+        os: [item.abi === "android" ? "android" : item.os],
         cpu: [item.arch],
-        ...(item.abi ? { libc: [item.abi] } : {}),
+        ...(item.abi && item.abi !== "android" ? { libc: [item.abi] } : {}),
       },
       null,
       2,

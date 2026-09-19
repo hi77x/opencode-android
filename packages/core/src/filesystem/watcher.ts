@@ -39,6 +39,7 @@ function getBackend() {
   if (process.platform === "win32") return "windows"
   if (process.platform === "darwin") return "fs-events"
   if (process.platform === "linux") return "inotify"
+  if (process.platform === "android") return "inotify"
 }
 
 function protecteds(dir: string) {

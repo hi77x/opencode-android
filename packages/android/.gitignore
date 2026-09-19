@@ -1,0 +1,16 @@
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+.kotlin/
+
+# The bundled server binary and tools are produced by script/android/build-apk.sh
+# and are too large for git. See README.md ("Bundled runtime") for how to
+# recreate them.
+app/src/main/jniLibs/
+app/src/main/assets/git-runtime.zip
+app/src/main/assets/usage-i18n.json
+
+# Release signing material stays local.
+keystore/

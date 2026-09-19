@@ -1,0 +1,80 @@
+{
+  "index": "https://packages.termux.dev/apt/termux-main/dists/stable/main/binary-aarch64/Packages",
+  "roots": [
+    "git"
+  ],
+  "packages": [
+    {
+      "name": "git",
+      "version": "2.55.0",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/g/git/git_2.55.0_aarch64.deb",
+      "sha256": "21b16fa06837e5bf94ad257da532c40eb049c120d21f6cb60a6411c0bcee7197"
+    },
+    {
+      "name": "libcurl",
+      "version": "8.22.0",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/libc/libcurl/libcurl_8.22.0_aarch64.deb",
+      "sha256": "e780d925d977c32a3cfe6a2c7d340f0726618786deee98b0cb8b601efb93a8c9"
+    },
+    {
+      "name": "libexpat",
+      "version": "2.8.4",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/libe/libexpat/libexpat_2.8.4_aarch64.deb",
+      "sha256": "71934cf00b404627702034bd1308cb58353dd851d9a2d3ecd9205b4ae6a67a27"
+    },
+    {
+      "name": "libiconv",
+      "version": "1.19",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/libi/libiconv/libiconv_1.19_aarch64.deb",
+      "sha256": "fe9481b1dc101c6c3552943f25435109fd522aecc615ae49594f9fbee863bb37"
+    },
+    {
+      "name": "openssl",
+      "version": "1:3.6.3",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/o/openssl/openssl_1:3.6.3_aarch64.deb",
+      "sha256": "86760e9ce736f463236f2c15b1eb3a3fdcfc5778d0fd7077a917448dcc90f3aa"
+    },
+    {
+      "name": "pcre2",
+      "version": "10.47",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/p/pcre2/pcre2_10.47_aarch64.deb",
+      "sha256": "51f915d22de639bfca6ec029ae613987bbe3bc73626eede13319fd2e95f50b63"
+    },
+    {
+      "name": "zlib",
+      "version": "1.3.2",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/z/zlib/zlib_1.3.2_aarch64.deb",
+      "sha256": "75e7d0af17fcc3b40004309fdc00a1ddb9ae08346dce5e269902c34ac3966ac9"
+    },
+    {
+      "name": "libnghttp2",
+      "version": "1.70.0",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/libn/libnghttp2/libnghttp2_1.70.0_aarch64.deb",
+      "sha256": "ab2e0a3408fe4934ffdf774bd5049a265db2e6db62dcb651baecbecfb81e3f0b"
+    },
+    {
+      "name": "libnghttp3",
+      "version": "1.18.0",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/libn/libnghttp3/libnghttp3_1.18.0_aarch64.deb",
+      "sha256": "0be2ee96def3608afaf24eb0b4b55f3484a37c95ea21bb1d6d85c7d543467603"
+    },
+    {
+      "name": "libngtcp2",
+      "version": "1.25.0",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/libn/libngtcp2/libngtcp2_1.25.0_aarch64.deb",
+      "sha256": "f471bad7f4329b6b0b4aedf124e0a23a35f6ac99bfbae73304136f8bfd570fc3"
+    },
+    {
+      "name": "libssh2",
+      "version": "1.11.1-2",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/libs/libssh2/libssh2_1.11.1-2_aarch64.deb",
+      "sha256": "1add4e0a926b848814e7e2f1817ea28b123c54cabd5bbc4e5cfd65291cbad84e"
+    },
+    {
+      "name": "ca-certificates",
+      "version": "1:2026.08.13",
+      "url": "https://packages.termux.dev/apt/termux-main/pool/main/c/ca-certificates/ca-certificates_1:2026.08.13_all.deb",
+      "sha256": "8e894fb885da738b4ca9a7932703e414d730fa32e78aba33046a747822547d5a"
+    }
+  ]
+}

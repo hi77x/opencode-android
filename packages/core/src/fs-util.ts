@@ -80,12 +80,17 @@ export namespace FSUtil {
         return yield* Effect.tryPromise({
           try: async () => {
             const entries = await NFS.readdir(dirPath, { withFileTypes: true })
-            return entries.map(
-              (e): DirEntry => ({
-                name: e.name,
-                type: e.isDirectory() ? "directory" : e.isSymbolicLink() ? "symlink" : e.isFile() ? "file" : "other",
-              }),
-            )
+            // Android/Bun can surface undefined entries for directories the
+            // process cannot stat; skip them instead of crashing on e.name.
+            return entries.flatMap((e) => {
+              if (!e || typeof e.name !== "string") return []
+              return [
+                {
+                  name: e.name,
+                  type: e.isDirectory() ? "directory" : e.isSymbolicLink() ? "symlink" : e.isFile() ? "file" : "other",
+                } satisfies DirEntry,
+              ]
+            })
           },
           catch: (cause) => new FileSystemError({ method: "readDirectoryEntries", cause }),
         })

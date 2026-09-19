@@ -112,7 +112,12 @@ export interface Picker {
 }
 
 export function available() {
-  return FileFinder.isAvailable()
+  // Android has no @ff-labs/fff-bin-* package, so lookups throw on unsupported platforms.
+  try {
+    return FileFinder.isAvailable()
+  } catch {
+    return false
+  }
 }
 
 export function create(opts: Init): Result<Picker> {
