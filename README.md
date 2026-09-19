@@ -44,7 +44,7 @@
 
 ## opencode for Android
 
-This fork makes the existing opencode run natively on Android: the phone runs the real server, the agent, sessions and the **unchanged** `packages/app` web UI (served over loopback in a WebView). No PC, no Termux, no remote server, no protocol changes.
+This fork makes the existing opencode run natively on Android: the phone runs the real server, the agent, sessions and the `packages/app` web UI, served over loopback in a WebView. The Android host adds mobile styles, a read-only Files browser and a Usage panel without modifying the `packages/app` source. No PC, Termux, root or remote OpenCode server is required; cloud models still need a network connection and provider credentials.
 
 What we added on top of upstream (everything else is upstream opencode):
 
@@ -56,16 +56,19 @@ What we added on top of upstream (everything else is upstream opencode):
 
 Only five upstream files are modified (Android build target plus runtime compatibility); each change is documented with its reason in [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
 
-How it works: the Android activity starts the bundled server (`libopencode.so serve --hostname=127.0.0.1`) and loads `http://127.0.0.1:4096/` in a WebView. Tools run from the app's native library directory: `/system/bin/sh`, bundled `git`, `rg`, and a Bun runtime exposed as `bun`/`node`.
+How it works: the Android activity starts the bundled server (`libopencode.so serve --hostname=127.0.0.1`) on a port selected at startup and loads `http://127.0.0.1:<port>/` in a WebView. Tools run from the app's native library directory: `/system/bin/sh`, bundled `git`, `rg`, and a Bun runtime exposed as `bun`/`node`.
 
 - **Download**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **Build**: `./script/android/build-apk.sh` — see [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **First launch**: grant file access (sessions live in `/sdcard/OpenCode` and survive reinstalls), then Settings → Providers → connect a provider and add a project (`~/workspace`)
+- **First launch**: grant all-files access for persistent data under `/sdcard/OpenCode/home`, then Settings → Providers → connect a provider and add a project (`~/workspace`). Without that permission, data is in app-private storage and is removed on uninstall. WebView project selection may need to be restored after reinstall.
 - **Works**: server and web UI, sessions, git with syntax-highlighted diffs (Changes), project file browser (Files), context-usage panel (Usage), command and JS/TS execution
 - **Limitations**: no PTY terminal, no LSP or formatters, no local MCP processes; the native file-watcher binding is unavailable (search uses `rg`)
 - **License**: MIT, same as upstream
 
 [![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+
+> [!IMPORTANT]
+> The `v0.1.1` release tag points to an older upstream commit without the Android module. The Android source is on `main`; use that branch for the [build instructions](docs/android/BUILD.md). The release APK has not been verified as a byte-for-byte build of `main`.
 
 ---
 
@@ -103,11 +106,11 @@ OpenCode is also available as a desktop application. Download directly from the 
 
 ### Mobile App (BETA)
 
-OpenCode also runs on Android as a native APK built from this fork. The app bundles the real server and the same web UI; sessions, provider keys and projects live in `/sdcard/OpenCode` and survive reinstalls.
+OpenCode also runs on Android as a native APK built from this fork. The app bundles the real server and the same web UI; with all-files access, server data lives under `/sdcard/OpenCode/home` and survives app removal. Without it, data is kept in app-private storage and is removed on uninstall.
 
 | Platform | Download | Notes |
 | --- | --- | --- |
-| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA - grant file access on first launch |
+| Android 8.0+ (arm64) | [`app-release.apk`](https://github.com/hi77x/opencode-android/releases/latest) | BETA - grant all-files access for persistent data |
 | Build from source | `./script/android/build-apk.sh` | see [`packages/android/README.md`](packages/android/README.md) |
 
 ```bash
