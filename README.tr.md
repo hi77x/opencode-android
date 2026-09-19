@@ -44,6 +44,9 @@
 
 ## Android için opencode
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 Bu çatal, mevcut opencode'u Android'de yerel olarak çalıştırır: telefonda gerçek sunucu, ajan, oturumlar ve **değiştirilmemiş** `packages/app` web arayüzü (WebView içinde loopback üzerinden) çalışır. PC yok, Termux yok, uzak sunucu yok ve protokol değişikliği yok.
 
 Upstream'e ek olarak bizim eklediklerimiz (geri kalan her şey upstream opencode):
@@ -56,11 +59,11 @@ Upstream'e ek olarak bizim eklediklerimiz (geri kalan her şey upstream opencode
 
 Yalnızca beş upstream dosyası değiştirilir (Android derleme hedefi ve çalışma zamanı uyumluluğu); her biri gerekçesiyle [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md) içinde belgelenmiştir.
 
-Nasıl çalışır: activity gömülü sunucuyu başlatır (`libopencode.so serve --hostname=127.0.0.1`) ve WebView'de `http://127.0.0.1:4096/` adresini yükler. Araçlar uygulamanın yerel kitaplık dizininden çalışır: `/system/bin/sh`, paketlenmiş `git`, `rg` ve `bun`/`node` olarak sunulan Bun çalışma zamanı.
+Nasıl çalışır: activity gömülü sunucuyu başlatır (`libopencode.so serve --hostname=127.0.0.1`) ve WebView'de `http://127.0.0.1:<port>/` adresini yükler. Araçlar uygulamanın yerel kitaplık dizininden çalışır: `/system/bin/sh`, paketlenmiş `git`, `rg` ve `bun`/`node` olarak sunulan Bun çalışma zamanı.
 
 - **İndirme**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **Derleme**: `./script/android/build-apk.sh` — bkz. [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **İlk açılış**: dosya erişimine izin verin (oturumlar `/sdcard/OpenCode` içinde tutulur ve yeniden kurulumdan sağ çıkar), sonra Ayarlar → Sağlayıcılar → bir sağlayıcı bağlayın ve proje ekleyin (`~/workspace`)
+- **İlk açılış**: dosya erişimine izin verin (oturumlar `/sdcard/OpenCode/home` içinde tutulur ve yeniden kurulumdan sağ çıkar), sonra Ayarlar → Sağlayıcılar → bir sağlayıcı bağlayın ve proje ekleyin (`~/workspace`)
 - **Çalışır**: sunucu ve web arayüzü, oturumlar, diff ve sözdizimi vurgulamalı git (Changes), proje dosya tarayıcısı (Files), bağlam kullanım paneli (Usage), komut ve JS/TS yürütme
 - **Sınırlamalar**: PTY terminali, LSP/biçimlendiriciler ve yerel MCP süreçleri yok; yerel file watcher yok (arama `rg` kullanır)
 - **Lisans**: MIT, orijinaliyle aynı
@@ -103,7 +106,7 @@ OpenCode ayrıca masaüstü uygulaması olarak da mevcuttur. Doğrudan [sürüm 
 
 ### Mobil Uygulama (BETA)
 
-OpenCode, bu çataldan derlenen yerel bir APK olarak Android'de de çalışır. Uygulama gerçek sunucuyu ve aynı web arayüzünü içerir; oturumlar, sağlayıcı anahtarları ve projeler `/sdcard/OpenCode` içinde tutulur ve yeniden kurulumdan sağ çıkar.
+OpenCode, bu çataldan derlenen yerel bir APK olarak Android'de de çalışır. Uygulama gerçek sunucuyu ve aynı web arayüzünü içerir; oturumlar, sağlayıcı anahtarları ve projeler `/sdcard/OpenCode/home` içinde tutulur ve yeniden kurulumdan sağ çıkar.
 
 | Platform | İndirme | Notlar |
 | --- | --- | --- |
