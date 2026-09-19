@@ -44,6 +44,9 @@
 
 ## opencode для Android
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 Цей форк запускає наявний opencode нативно на Android: на телефоні працюють справжній сервер, агент, сесії та **незмінений** веб-інтерфейс `packages/app` (через loopback у WebView). Без ПК, Termux, віддаленого сервера та змін протоколу.
 
 Що додали ми (усе інше — upstream opencode):
@@ -56,11 +59,11 @@
 
 Змінено лише п'ять файлів upstream (ціль збірки під Android і сумісність рантайму); кожен описано з причиною в [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
 
-Як це працює: активність запускає вбудований сервер (`libopencode.so serve --hostname=127.0.0.1`) і завантажує `http://127.0.0.1:4096/` у WebView. Інструменти запускаються з nativeLibraryDir: `/system/bin/sh`, вбудовані `git`, `rg` і рантайм Bun як `bun`/`node`.
+Як це працює: активність запускає вбудований сервер (`libopencode.so serve --hostname=127.0.0.1`) і завантажує `http://127.0.0.1:<port>/` у WebView. Інструменти запускаються з nativeLibraryDir: `/system/bin/sh`, вбудовані `git`, `rg` і рантайм Bun як `bun`/`node`.
 
 - **Завантажити**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **Збірка**: `./script/android/build-apk.sh` — див. [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **Перший запуск**: надайте доступ до файлів (сесії зберігаються в `/sdcard/OpenCode` і переживають перевстановлення), далі Налаштування → Провайдери → підключіть провайдера й додайте проєкт (`~/workspace`)
+- **Перший запуск**: надайте доступ до файлів (сесії зберігаються в `/sdcard/OpenCode/home` і переживають перевстановлення), далі Налаштування → Провайдери → підключіть провайдера й додайте проєкт (`~/workspace`)
 - **Працює**: сервер і веб-інтерфейс, сесії, git з діфами й підсвічуванням (Changes), браузер файлів (Files), панель використання контексту (Usage), виконання команд і JS/TS
 - **Обмеження**: немає PTY-термінала, LSP і форматерів, локальних MCP-процесів; нативний file watcher недоступний (пошук через `rg`)
 - **Ліцензія**: MIT, як в оригіналі
@@ -103,7 +106,7 @@ OpenCode також доступний як десктопний застосу�
 
 ### Мобільний застосунок (BETA)
 
-OpenCode також працює на Android як нативна APK, зібрана з цього форку. Застосунок містить справжній сервер і той самий веб-інтерфейс; сесії, ключі провайдерів і проєкти зберігаються в `/sdcard/OpenCode` і переживають перевстановлення.
+OpenCode також працює на Android як нативна APK, зібрана з цього форку. Застосунок містить справжній сервер і той самий веб-інтерфейс; сесії, ключі провайдерів і проєкти зберігаються в `/sdcard/OpenCode/home` і переживають перевстановлення.
 
 | Платформа | Завантаження | Примітки |
 | --- | --- | --- |
