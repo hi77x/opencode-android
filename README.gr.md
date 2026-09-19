@@ -44,6 +44,9 @@
 
 ## opencode για Android
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 Αυτό το fork εκτελεί το υπάρχον opencode εγγενώς στο Android: το τηλέφωνο τρέχει τον πραγματικό server, τον agent, τις συνεδρίες και το **αμετάβλητο** web UI του `packages/app` (μέσω loopback σε WebView). Χωρίς PC, χωρίς Termux, χωρίς απομακρυσμένο server και χωρίς αλλαγές στο πρωτόκολλο.
 
 Τι προσθέσαμε εμείς (όλα τα υπόλοιπα είναι upstream opencode):
@@ -56,11 +59,11 @@
 
 Τροποποιούνται μόνο πέντε αρχεία upstream (στόχος build Android και συμβατότητα runtime); καθένα τεκμηριώνεται με την αιτία του στο [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
 
-Πώς λειτουργεί: η Activity ξεκινά τον ενσωματωμένο server (`libopencode.so serve --hostname=127.0.0.1`) και φορτώνει το `http://127.0.0.1:4096/` σε WebView. Τα εργαλεία εκτελούνται από τον nativeLibraryDir της εφαρμογής: `/system/bin/sh`, ενσωματωμένα `git`, `rg` και runtime Bun ως `bun`/`node`.
+Πώς λειτουργεί: η Activity ξεκινά τον ενσωματωμένο server (`libopencode.so serve --hostname=127.0.0.1`) και φορτώνει το `http://127.0.0.1:<port>/` σε WebView. Τα εργαλεία εκτελούνται από τον nativeLibraryDir της εφαρμογής: `/system/bin/sh`, ενσωματωμένα `git`, `rg` και runtime Bun ως `bun`/`node`.
 
 - **Λήψη**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **Build**: `./script/android/build-apk.sh` — δείτε [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **Πρώτη εκκίνηση**: δώστε πρόσβαση στα αρχεία (οι συνεδρίες βρίσκονται στο `/sdcard/OpenCode` και επιβιώνουν από επανεγκατάσταση), μετά Ρυθμίσεις → Πάροχοι → συνδέστε πάροχο και προσθέστε έργο (`~/workspace`)
+- **Πρώτη εκκίνηση**: δώστε πρόσβαση στα αρχεία (οι συνεδρίες βρίσκονται στο `/sdcard/OpenCode/home` και επιβιώνουν από επανεγκατάσταση), μετά Ρυθμίσεις → Πάροχοι → συνδέστε πάροχο και προσθέστε έργο (`~/workspace`)
 - **Λειτουργεί**: server και web UI, συνεδρίες, git με diffs και επισήμανση σύνταξης (Changes), περιηγητής αρχείων (Files), πίνακας χρήσης περιβάλλοντος (Usage), εκτέλεση εντολών και JS/TS
 - **Περιορισμοί**: χωρίς τερματικό PTY, LSP/formatters και τοπικές διεργασίες MCP· ο native file watcher δεν είναι διαθέσιμος (η αναζήτηση χρησιμοποιεί `rg`)
 - **Άδεια**: MIT, όπως στο αρχικό
@@ -103,7 +106,7 @@ nix run nixpkgs#opencode           # ή github:anomalyco/opencode με βάση 
 
 ### Εφαρμογή για κινητά (BETA)
 
-Το OpenCode λειτουργεί επίσης σε Android ως εγγενές APK που χτίζεται από αυτό το fork. Η εφαρμογή περιλαμβάνει τον πραγματικό server και το ίδιο web UI· οι συνεδρίες, τα κλειδιά παρόχων και τα έργα βρίσκονται στο `/sdcard/OpenCode` και επιβιώνουν από επανεγκατάσταση.
+Το OpenCode λειτουργεί επίσης σε Android ως εγγενές APK που χτίζεται από αυτό το fork. Η εφαρμογή περιλαμβάνει τον πραγματικό server και το ίδιο web UI· οι συνεδρίες, τα κλειδιά παρόχων και τα έργα βρίσκονται στο `/sdcard/OpenCode/home` και επιβιώνουν από επανεγκατάσταση.
 
 | Πλατφόρμα | Λήψη | Σημειώσεις |
 | --- | --- | --- |
