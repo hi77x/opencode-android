@@ -44,6 +44,9 @@
 
 ## Android-এর জন্য opencode
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 এই ফর্কটি বিদ্যমান opencode-কে Android-এ নেটিভভাবে চালায়: ফোনে আসল সার্ভার, এজেন্ট, সেশন এবং **অপরিবর্তিত** `packages/app` ওয়েব ইন্টারফেস (WebView-এ loopback-এর মাধ্যমে) চলে। পিসি, Termux বা দূরবর্তী সার্ভার লাগে না এবং প্রোটোকল বদলানো হয় না।
 
 আমরা upstream-এর উপরে যা যোগ করেছি (বাকি সব upstream opencode):
@@ -56,11 +59,11 @@
 
 শুধু পাঁচটি upstream ফাইল পরিবর্তন করা হয়েছে (Android বিল্ড টার্গেট ও রানটাইম সামঞ্জস্য); প্রতিটির কারণ [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md)-এ লেখা আছে।
 
-কীভাবে কাজ করে: Activity এমবেডেড সার্ভার চালু করে (`libopencode.so serve --hostname=127.0.0.1`) এবং WebView-এ `http://127.0.0.1:4096/` লোড করে। টুলগুলো অ্যাপের nativeLibraryDir থেকে চলে: `/system/bin/sh`, বান্ডল করা `git`, `rg` এবং `bun`/`node` নামে Bun রানটাইম।
+কীভাবে কাজ করে: Activity এমবেডেড সার্ভার চালু করে (`libopencode.so serve --hostname=127.0.0.1`) এবং WebView-এ `http://127.0.0.1:<port>/` লোড করে। টুলগুলো অ্যাপের nativeLibraryDir থেকে চলে: `/system/bin/sh`, বান্ডল করা `git`, `rg` এবং `bun`/`node` নামে Bun রানটাইম।
 
 - **ডাউনলোড**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **বিল্ড**: `./script/android/build-apk.sh` — দেখুন [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **প্রথম চালু**: ফাইল অ্যাক্সেস দিন (সেশন `/sdcard/OpenCode`-এ থাকে এবং পুনঃইনস্টলেও টিকে থাকে), তারপর সেটিংস → প্রোভাইডার → একটি প্রোভাইডার যুক্ত করুন এবং একটি প্রকল্প (`~/workspace`) যোগ করুন
+- **প্রথম চালু**: ফাইল অ্যাক্সেস দিন (সেশন `/sdcard/OpenCode/home`-এ থাকে এবং পুনঃইনস্টলেও টিকে থাকে), তারপর সেটিংস → প্রোভাইডার → একটি প্রোভাইডার যুক্ত করুন এবং একটি প্রকল্প (`~/workspace`) যোগ করুন
 - **কাজ করে**: সার্ভার ও ওয়েব UI, সেশন, diff ও সিনট্যাক্স হাইলাইটসহ git (Changes), প্রকল্প ফাইল ব্রাউজার (Files), কনটেক্সট ব্যবহার প্যানেল (Usage), কমান্ড ও JS/TS চালানো
 - **সীমাবদ্ধতা**: PTY টার্মিনাল, LSP/ফরম্যাটার ও লোকাল MCP প্রসেস নেই; নেটিভ file watcher নেই (সার্চ `rg` ব্যবহার করে)
 - **লাইসেন্স**: MIT, মূল প্রকল্পের মতোই
@@ -103,7 +106,7 @@ OpenCode ডেস্কটপ অ্যাপ্লিকেশন হিসে
 
 ### মোবাইল অ্যাপ (BETA)
 
-OpenCode এই ফর্ক থেকে বিল্ড করা নেটিভ APK হিসেবে Android-এও চলে। অ্যাপে আসল সার্ভার ও একই ওয়েব UI আছে; সেশন, প্রোভাইডার কী এবং প্রকল্প `/sdcard/OpenCode`-এ থাকে এবং পুনঃইনস্টলেও টিকে থাকে।
+OpenCode এই ফর্ক থেকে বিল্ড করা নেটিভ APK হিসেবে Android-এও চলে। অ্যাপে আসল সার্ভার ও একই ওয়েব UI আছে; সেশন, প্রোভাইডার কী এবং প্রকল্প `/sdcard/OpenCode/home`-এ থাকে এবং পুনঃইনস্টলেও টিকে থাকে।
 
 | প্ল্যাটফর্ম | ডাউনলোড | নোট |
 | --- | --- | --- |
