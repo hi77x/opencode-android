@@ -44,6 +44,9 @@
 
 ## opencode cho Android
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 Bản fork này chạy opencode hiện có một cách native trên Android: điện thoại chạy máy chủ thật, agent, phiên làm việc và giao diện `packages/app` **không thay đổi** (qua loopback trong WebView). Không cần PC, Termux, máy chủ từ xa và không thay đổi giao thức.
 
 Những gì chúng tôi thêm vào (phần còn lại là opencode upstream):
@@ -56,11 +59,11 @@ Những gì chúng tôi thêm vào (phần còn lại là opencode upstream):
 
 Chỉ năm tệp upstream được sửa (mục tiêu build Android và tương thích runtime); mỗi thay đổi đều có lý do trong [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
 
-Cách hoạt động: Activity khởi động máy chủ nhúng (`libopencode.so serve --hostname=127.0.0.1`) và tải `http://127.0.0.1:4096/` trong WebView. Công cụ chạy từ nativeLibraryDir của ứng dụng: `/system/bin/sh`, `git`, `rg` đi kèm và runtime Bun được công khai là `bun`/`node`.
+Cách hoạt động: Activity khởi động máy chủ nhúng (`libopencode.so serve --hostname=127.0.0.1`) và tải `http://127.0.0.1:<port>/` trong WebView. Công cụ chạy từ nativeLibraryDir của ứng dụng: `/system/bin/sh`, `git`, `rg` đi kèm và runtime Bun được công khai là `bun`/`node`.
 
 - **Tải xuống**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **Build**: `./script/android/build-apk.sh` — xem [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **Lần chạy đầu**: cấp quyền truy cập tệp (phiên lưu trong `/sdcard/OpenCode` và tồn tại qua cài đặt lại), sau đó Cài đặt → Nhà cung cấp → kết nối nhà cung cấp và thêm dự án (`~/workspace`)
+- **Lần chạy đầu**: cấp quyền truy cập tệp (phiên lưu trong `/sdcard/OpenCode/home` và tồn tại qua cài đặt lại), sau đó Cài đặt → Nhà cung cấp → kết nối nhà cung cấp và thêm dự án (`~/workspace`)
 - **Hoạt động**: máy chủ và giao diện web, phiên, git với diff và tô sáng cú pháp (Changes), trình duyệt tệp dự án (Files), bảng mức sử dụng ngữ cảnh (Usage), chạy lệnh và JS/TS
 - **Hạn chế**: không có terminal PTY, LSP/trình định dạng hay tiến trình MCP cục bộ; file watcher native không khả dụng (tìm kiếm dùng `rg`)
 - **Giấy phép**: MIT, giống bản gốc
@@ -103,7 +106,7 @@ OpenCode cũng có sẵn dưới dạng ứng dụng desktop. Tải trực tiế
 
 ### Ứng dụng di động (BETA)
 
-OpenCode cũng chạy trên Android dưới dạng APK native được build từ fork này. Ứng dụng chứa máy chủ thật và cùng giao diện web; phiên, khóa nhà cung cấp và dự án lưu trong `/sdcard/OpenCode` và tồn tại qua cài đặt lại.
+OpenCode cũng chạy trên Android dưới dạng APK native được build từ fork này. Ứng dụng chứa máy chủ thật và cùng giao diện web; phiên, khóa nhà cung cấp và dự án lưu trong `/sdcard/OpenCode/home` và tồn tại qua cài đặt lại.
 
 | Nền tảng | Tải xuống | Ghi chú |
 | --- | --- | --- |
