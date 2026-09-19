@@ -5,7 +5,10 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -33,6 +36,7 @@ class MainActivity : Activity() {
     private lateinit var overlay: TextView
     private var server: EmbeddedServer? = null
     private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
+    private var serverOnPrivateStorage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,10 +117,49 @@ class MainActivity : Activity() {
 
         val embedded = EmbeddedServer(applicationContext)
         server = embedded
+        requestSharedStorageIfNeeded()
+        startServer(embedded)
+    }
+
+    private fun sharedStorageReady(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
+        } else {
+            checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+
+    /**
+     * opencode stores sessions under HOME. Shared storage (`/sdcard/OpenCode`)
+     * survives uninstalls; without the permission the host falls back to
+     * app-private storage, which is wiped on uninstall.
+     */
+    private fun requestSharedStorageIfNeeded() {
+        if (sharedStorageReady()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            runCatching {
+                startActivity(
+                    Intent(
+                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                        Uri.parse("package:$packageName"),
+                    ),
+                )
+            }.onFailure {
+                runCatching { startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)) }
+            }
+            return
+        }
+        requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST)
+    }
+
+    private fun startServer(embedded: EmbeddedServer) {
+        overlay.visibility = View.VISIBLE
+        overlay.text = getString(R.string.starting)
         Thread {
             runCatching { embedded.start() }
                 .onSuccess { port ->
-                    Log.i(TAG, "server ready on port $port")
+                    serverOnPrivateStorage = !sharedStorageReady()
+                    Log.i(TAG, "server ready on port $port (shared=${!serverOnPrivateStorage})")
                     runOnUiThread {
                         overlay.visibility = View.GONE
                         webView.loadUrl("http://127.0.0.1:$port/")
@@ -125,9 +168,28 @@ class MainActivity : Activity() {
                 .onFailure { error ->
                     Log.e(TAG, "server failed to start", error)
                     runOnUiThread {
+                        overlay.visibility = View.VISIBLE
                         overlay.text = getString(R.string.start_failed, error.message ?: "unknown error")
                     }
                 }
+        }.start()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val embedded = server ?: return
+        if (!serverOnPrivateStorage || !sharedStorageReady()) return
+        // Shared storage was granted while the server ran on private storage:
+        // restart so sessions move to /sdcard/OpenCode and survive reinstalls.
+        Log.i(TAG, "shared storage granted, restarting server")
+        serverOnPrivateStorage = false
+        Thread {
+            embedded.stop()
+            runCatching { embedded.start() }
+                .onSuccess { port ->
+                    runOnUiThread { webView.loadUrl("http://127.0.0.1:$port/") }
+                }
+                .onFailure { error -> Log.e(TAG, "server restart failed", error) }
         }.start()
     }
 
@@ -238,6 +300,7 @@ class MainActivity : Activity() {
     companion object {
         private const val TAG = "OpenCodeAndroid"
         private const val FILE_CHOOSER_REQUEST = 1001
+        private const val STORAGE_REQUEST = 1002
 
         private val MOBILE_CSS =
             """

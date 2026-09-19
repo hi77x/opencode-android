@@ -1,6 +1,8 @@
 package ai.opencode.android
 
 import android.content.Context
+import android.os.Build
+import android.os.Environment
 import android.util.Log
 import java.io.BufferedInputStream
 import java.io.File
@@ -38,13 +40,50 @@ class EmbeddedServer(private val context: Context) {
      */
     private fun canonical(file: File): File = runCatching { file.canonicalFile }.getOrDefault(file)
 
+    fun sharedStorageAllowed(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
+        } else {
+            context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+
+    /**
+     * Sessions, provider auth and projects live under HOME. Keeping HOME in the
+     * app's private directory means an uninstall wipes every chat, so when the
+     * user grants shared-storage access the data moves to
+     * `/storage/emulated/0/OpenCode` and survives reinstalls.
+     */
+    private fun dataRoot(): File {
+        val shared = canonical(File(Environment.getExternalStorageDirectory(), "OpenCode"))
+        val usable = sharedStorageAllowed() && (shared.isDirectory || shared.mkdirs())
+        return if (usable) shared else canonical(context.filesDir)
+    }
+
+    private fun migratePrivateData(sharedHome: File) {
+        val privateHome = canonical(File(context.filesDir, "home"))
+        if (!privateHome.isDirectory) return
+        val marker = File(sharedHome, ".migrated")
+        if (marker.isFile) return
+        runCatching {
+            privateHome.copyRecursively(sharedHome, overwrite = false)
+            marker.writeText("migrated from private storage\n")
+            Log.i(TAG, "migrated private data to ${sharedHome.absolutePath}")
+        }.onFailure { Log.w(TAG, "migration failed: ${it.message}") }
+    }
+
     fun running(): Boolean = process?.isAlive == true
 
     fun binary(): File = File(context.applicationInfo.nativeLibraryDir, "libopencode.so")
 
     fun nativeLibraryDir(): File = File(context.applicationInfo.nativeLibraryDir)
 
-    fun home(): File = canonical(File(context.filesDir, "home").apply { mkdirs() })
+    fun home(): File {
+        val root = dataRoot()
+        val home = canonical(File(root, "home").apply { mkdirs() })
+        if (root != canonical(context.filesDir)) migratePrivateData(home)
+        return home
+    }
 
     fun binDir(): File = canonical(File(context.filesDir, "bin").apply { mkdirs() })
 
