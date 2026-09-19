@@ -44,6 +44,9 @@
 
 ## opencode dla Androida
 
+> [!IMPORTANT]
+> Android data survives reinstall only if all-files access is granted: server data is stored under `/sdcard/OpenCode/home`; otherwise app-private data is removed on uninstall. You may need to reselect a project after reinstalling. The `v0.1.1` source tag predates the Android module; build from `main`. The uploaded APK has not been verified as a byte-for-byte build of `main`. See the [current Android notes](README.md#opencode-for-android).
+
 Ten fork uruchamia istniejący opencode natywnie na Androidzie: telefon uruchamia prawdziwy serwer, agenta, sesje i **niezmieniony** interfejs `packages/app` (przez loopback w WebView). Bez komputera, bez Termuksa, bez zdalnego serwera i bez zmian protokołu.
 
 Co dodaliśmy od siebie (reszta to upstream opencode):
@@ -56,11 +59,11 @@ Co dodaliśmy od siebie (reszta to upstream opencode):
 
 Zmieniono tylko pięć plików upstream (cel kompilacji Androida i zgodność środowiska); każdy opisano w [`docs/android/UPSTREAM_PATCHES.md`](docs/android/UPSTREAM_PATCHES.md).
 
-Jak to działa: activity uruchamia wbudowany serwer (`libopencode.so serve --hostname=127.0.0.1`) i ładuje `http://127.0.0.1:4096/` w WebView. Narzędzia działają z katalogu bibliotek natywnych: `/system/bin/sh`, dołączone `git`, `rg` oraz środowisko Bun jako `bun`/`node`.
+Jak to działa: activity uruchamia wbudowany serwer (`libopencode.so serve --hostname=127.0.0.1`) i ładuje `http://127.0.0.1:<port>/` w WebView. Narzędzia działają z katalogu bibliotek natywnych: `/system/bin/sh`, dołączone `git`, `rg` oraz środowisko Bun jako `bun`/`node`.
 
 - **Pobierz**: [releases](https://github.com/hi77x/opencode-android/releases) (`app-release.apk`, arm64, Android 8.0+)
 - **Kompilacja**: `./script/android/build-apk.sh` — zob. [`docs/android/BUILD.md`](docs/android/BUILD.md)
-- **Pierwsze uruchomienie**: przyznaj dostęp do plików (sesje są w `/sdcard/OpenCode` i przeżywają reinstalację), następnie Ustawienia → Dostawcy → połącz dostawcę i dodaj projekt (`~/workspace`)
+- **Pierwsze uruchomienie**: przyznaj dostęp do plików (sesje są w `/sdcard/OpenCode/home` i przeżywają reinstalację), następnie Ustawienia → Dostawcy → połącz dostawcę i dodaj projekt (`~/workspace`)
 - **Działa**: serwer i interfejs webowy, sesje, git z diffami i podświetlaniem (Changes), przeglądarka plików (Files), panel użycia kontekstu (Usage), wykonywanie poleceń i JS/TS
 - **Ograniczenia**: brak terminala PTY, LSP/formatterów i lokalnych procesów MCP; natywny file watcher jest niedostępny (wyszukiwanie używa `rg`)
 - **Licencja**: MIT, jak w oryginale
@@ -103,7 +106,7 @@ OpenCode jest także dostępny jako aplikacja desktopowa. Pobierz ją bezpośred
 
 ### Aplikacja mobilna (BETA)
 
-OpenCode działa też na Androidzie jako natywna APK zbudowana z tego forka. Aplikacja zawiera prawdziwy serwer i ten sam interfejs webowy; sesje, klucze dostawców i projekty są w `/sdcard/OpenCode` i przeżywają reinstalację.
+OpenCode działa też na Androidzie jako natywna APK zbudowana z tego forka. Aplikacja zawiera prawdziwy serwer i ten sam interfejs webowy; sesje, klucze dostawców i projekty są w `/sdcard/OpenCode/home` i przeżywają reinstalację.
 
 | Platforma | Pobieranie | Uwagi |
 | --- | --- | --- |
